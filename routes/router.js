@@ -2,12 +2,11 @@ const express = require("express");
 const router  = express.Router();
 const bcrypt  = require("bcryptjs");
 const jwt     = require("jsonwebtoken");
-const uuid    = require("uuid");
 
 
 const db = require("../lib/db");
 const userMiddleware = require("../middleware/users.js");
-const { validateRegister } = require("../middleware/users.js");
+// const { validateRegister } = require("../middleware/users.js");
 
 // http://localhost:4000/api/sign-up
 router.post("/sign-up", userMiddleware.validateRegister, (req, res, next) => {

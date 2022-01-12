@@ -15,7 +15,10 @@
              </div>
 
              <div class="mt-3">
-                 <button type="submit" class="btn btn-primary" >Login</button>
+                 <button type="submit" class="btn btn-primary" >Se connecter
+                     <span v-if="status == 'loading'">Connexion en cours...</span>
+                     <span v-else>Connexion</span>
+                 </button>
              </div>
          </form>
      </div>
@@ -24,17 +27,23 @@
  <script>
 
 import axios from 'axios';
-import {instance} from '../api'
+import {instance} from '../api';
+import { mapState } from 'vuex';
 
 export default {
   
        data(){
         return {
-            email: '',
-            password: '',
-            isSuccess: false,
-            comment: '',
+            email     : '',
+            password  : '',
+            isSuccess : false,
+            comment   : '',
         };
+    },
+    computed: {
+        validateFields: function () {
+            
+        }
     },
     methods: {
         onLogin() {

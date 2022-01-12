@@ -9,7 +9,7 @@ const userMiddleware = require("../middleware/users.js");
 // const { validateRegister } = require("../middleware/users.js");
 
 // http://localhost:4000/api/sign-up
-router.post("/sign-up", userMiddleware.validateRegister, (req, res, next) => {
+router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
 
     const user = ({ email: req.body.email });
     const mysql = `SELECT idtableUser FROM tableUser WHERE LOWER(email) = LOWER ?`;

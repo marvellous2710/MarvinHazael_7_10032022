@@ -1,22 +1,19 @@
 const express = require("express");
-const router  = express.Router();
-const bcrypt  = require("bcryptjs");
-const jwt     = require("jsonwebtoken");
-const uuid    = require("uuid");
-
-
-const db = require("../lib/db");
+const router = express.Router();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const db = require("../db");
 const userMiddleware = require("../middleware/users.js");
-const { validateRegister } = require("../middleware/users.js");
+
 
 // http://localhost:4000/api/sign-up
 router.post("/sign-up", userMiddleware.validateRegister, (req, res, next) => {
 
-    const user = ({ email: req.body.email });
-    const mysql = `SELECT idtableUser FROM tableUser WHERE LOWER(email) = LOWER ?`;
+  const user = ({ email: req.body.email });
+  const mysql = `SELECT idtableUser FROM tableUser WHERE LOWER(email) = LOWER ?`;
   //on compare si l'utilisateur existe avant de l'enregistrer
   db.query(
-    mysql,user,
+    mysql, user,
     (err, result) => {
       if (result && result.length) {
         return res.status(409).send({
@@ -28,14 +25,14 @@ router.post("/sign-up", userMiddleware.validateRegister, (req, res, next) => {
             return res.status(500).send({
               message: err,
             });
-          } else {    
+          } else {
             //   const user = ` INSERT INTO tableUser (email, password) VALUES ('${(req.body.email)}', '${hash}'); ` ;
             const user = ({ email: req.body.email, password: hash });
-            const mysql = ` INSERT INTO tableUser SET ? ` ;
-           
+            const mysql = ` INSERT INTO tableUser SET ? `;
+
             db.query(
-                mysql,
-                user ,
+              mysql,
+              user,
               (err, result) => {
                 if (err) {
                   throw err;
@@ -59,12 +56,12 @@ router.post("/sign-up", userMiddleware.validateRegister, (req, res, next) => {
 // http://localhost:4000/api/login
 router.post("/login", (req, res, next) => {
 
-  const user = ({ email: req.body.email});  
+  const user = ({ email: req.body.email });
   //const userLogged = `SELECT * FROM tableUser WHERE email = ('${(req.body.email)}');`;
   const mysql = `SELECT * FROM tableUser WHERE ?`;
 
   db.query(
-    mysql,user,
+    mysql, user,
     (err, result) => {
       if (err) {
         throw err;
@@ -105,7 +102,7 @@ router.post("/login", (req, res, next) => {
             return res.status(200).send({
               message: "Logged in MOTHER FUCKEEEER ! ",
               token,
-            //   user: result[0],
+              //   user: result[0],
               email: result[0],
             });
           }
@@ -119,7 +116,7 @@ router.post("/login", (req, res, next) => {
 });
 
 // http://localhost:4000/api/secret-route
-router.post("secret-route", (req, res, next) => {});
+router.post("secret-route", (req, res, next) => { });
 
 
 module.exports = router;

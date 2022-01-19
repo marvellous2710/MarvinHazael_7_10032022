@@ -2,9 +2,7 @@ const express = require("express");
 const router  = express.Router();
 const bcrypt  = require("bcryptjs");
 const jwt     = require("jsonwebtoken");
-
-
-const db = require("../lib/db");
+const db      = require("../lib/db");
 const userMiddleware = require("../middleware/users.js");
 // const { validateRegister } = require("../middleware/users.js");
 
@@ -28,7 +26,6 @@ router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
               message: err,
             });
           } else {    
-            //   const user = ` INSERT INTO tableUser (email, password) VALUES ('${(req.body.email)}', '${hash}'); ` ;
             const user = ({ email: req.body.email, password: hash });
             const mysql = ` INSERT INTO tableUser SET ? ` ;
            
@@ -59,7 +56,6 @@ router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
 router.post("/login", (req, res, next) => {
 
   const user = ({ email: req.body.email});  
-  //const userLogged = `SELECT * FROM tableUser WHERE email = ('${(req.body.email)}');`;
   const mysql = `SELECT * FROM tableUser WHERE ?`;
 
   db.query(
@@ -84,7 +80,7 @@ router.post("/login", (req, res, next) => {
           if (bErr) {
             throw bErr;
             return res.status(400).send({
-              message: "Email or password incorrect !",
+              message: "Email or password incorrect !2",
             });
           }
           if (bResult) {
@@ -97,12 +93,8 @@ router.post("/login", (req, res, next) => {
               "SECRETKEY",
               { expiresIn: "7d" }
             );
-            // db.query(
-            //   //`UPDATE tableUser SET last_login = now () WHERE id = ${result[0].id};`
-            //   `UPDATE tableUser SET last_login = now () WHERE email = ${result[0].email};`
-            // );
             return res.status(200).send({
-              message: "Logged in MOTHER FUCKEEEER ! ",
+              message: "Logged ! ",
               token,
             //   user: result[0],
               email: result[0],
@@ -117,8 +109,64 @@ router.post("/login", (req, res, next) => {
   );
 });
 
-// http://localhost:4000/api/secret-route
-router.post("secret-route", (req, res, next) => {});
 
+
+// http://localhost:4000/api/:id update profile mysql node
+// router.put("/edit", (req, res, next) => {
+//   const mysql = 'UPDATE tableUser SET `name` = ? WHERE idtableUser = ?';
+//   //const mysql = 'UPDATE tableUser SET `name` = ?, `firstname` = ?, `email` = ?, `password` = ? WHERE idtableUser = ?';
+//   //const user = ({ email: req.body.email}); 
+//   const user = req.body; 
+//   const data = [user.name, userId/* id récup dans le token */];
+  
+//   db.query(
+//     mysql, data,
+//     (err, result) => {
+//       if (err) {
+//         throw err;
+//         return res.status(400).send({
+//           message: err,
+//         });
+//       } else {
+//         return res.status(200).send({
+//           message: "Updated successfully ! "
+//         });
+//       }
+//     })
+// });
+
+
+router.put("/edit", (req, res, next) => {
+  const mysql = 'UPDATE tableuser SET `name` = ?, `firstname` = ?,`profilepicture` = ?, `description`= ? WHERE idtableuser = ?';
+  const user = req.body; 
+  const data = [user.name, user.firstname, user.profilepicture, user.description, user.idtableUser];
+       
+  db.query(
+      mysql,data,
+    (err, result) => {
+      if (err) {
+        throw err;
+        return res.status(400).send({
+          message: err,
+        });
+      }
+      return res.status(201).send({
+        message: "Updated successfully !",
+      });
+    }
+  );
+})
+
+
+//UPDATE tableuser SET `name` = 'Ouzoumaki' WHERE idtableuser = 43;MARCHE 
+//UPDATE [table] SET champ=valeur, champ=valeur WHERE [conditions]
+
+
+// http://localhost:4000/api/:id
+router.delete("/:id", (req, res, next) => {
+// faire attention à ne pas supprimer totalement le user pour ne pas supprimer tous ses commentaires sur lesquelles des réactions ont été générées
+//supprimer que la photo par exemple
+//faire en sorte qu'il ne puisse plus se logger mais que son compte existe toujours comme sur OC
+});
 
 module.exports = router;

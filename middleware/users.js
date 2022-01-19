@@ -15,15 +15,7 @@ module.exports = {
         message: "Please enter a password with min. 6 chars",
       });
     }
-    // pasword repeat (must) match
-    // if (
-    //   !req.body.password_repeat ||
-    //   req.body.password != req.body.password_repeat
-    // ) {
-    //   return res.status(400).send({
-    //     message: "Both passwords must match",
-    //   });
-    // }
+  
     next();
   },
   isLoggedIn: () => {},

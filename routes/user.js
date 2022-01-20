@@ -27,7 +27,7 @@ router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
             });
           } else {    
             const user = ({ email: req.body.email, password: hash });
-            const mysql = ` INSERT INTO tableUser SET ? ` ;
+            const mysql = `INSERT INTO tableUser SET ?`;
            
             db.query(
                 mysql,
@@ -49,6 +49,8 @@ router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
       }
     }
   );
+
+  
 });
 
 
@@ -95,8 +97,7 @@ router.post("/login", (req, res, next) => {
             );
             return res.status(200).send({
               message: "Logged ! ",
-              token,
-            //   user: result[0],
+              token,          
               email: result[0],
             });
           }
@@ -137,12 +138,14 @@ router.post("/login", (req, res, next) => {
 
 
 router.put("/edit", (req, res, next) => {
+  
+  //si pas d'id ça marche quand meme sur postman mais pas dans mysql
   const mysql = 'UPDATE tableuser SET `name` = ?, `firstname` = ?,`profilepicture` = ?, `description`= ? WHERE idtableuser = ?';
   const user = req.body; 
   const data = [user.name, user.firstname, user.profilepicture, user.description, user.idtableUser];
        
   db.query(
-      mysql,data,
+      mysql, data,
     (err, result) => {
       if (err) {
         throw err;
@@ -155,7 +158,7 @@ router.put("/edit", (req, res, next) => {
       });
     }
   );
-})
+});
 
 
 //UPDATE tableuser SET `name` = 'Ouzoumaki' WHERE idtableuser = 43;MARCHE 
@@ -168,5 +171,27 @@ router.delete("/:id", (req, res, next) => {
 //supprimer que la photo par exemple
 //faire en sorte qu'il ne puisse plus se logger mais que son compte existe toujours comme sur OC
 });
+
+
+
+
+router.get("/alluser", (req, res, next) => {
+  const mysql = 'SELECT * FROM tableuser ';
+  
+  db.query(
+      mysql,
+    (err, result) => {
+      if (err) {
+        throw err;
+        return res.status(400).send({
+          message: err,
+        });
+      }  
+      return res.status(201).send(result)    
+    }
+  );
+});
+
+
 
 module.exports = router;

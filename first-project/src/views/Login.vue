@@ -1,6 +1,6 @@
  <template>
      <div>
-         <h2>Login</h2>
+         <h2>Connexion</h2>
          <hr />
 
          <div class="alert alert-success" v-if="isSuccess">Post Created Successfully</div>
@@ -64,6 +64,7 @@ export default {
                 )
                 .then((response) => {
                     this.isSuccess = true;
+                    this.$router.push('/');
                     console.log(response);
                 });
         },

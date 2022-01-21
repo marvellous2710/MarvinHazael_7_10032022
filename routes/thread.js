@@ -28,7 +28,7 @@ router.post("/addthread", (req, res, next) => {
 router.put("/:threadId", (req, res, next) => {
 
   
-  const mysql = 'UPDATE thread SET `titre` = ?, `text` = ? WHERE idthread = ?';
+  const mysql = 'UPDATE thread SET `titre` = ? , `text` = ? WHERE idthread = ?';
   const user = req.body; 
   const threadId = req.params.threadId;
   const data = [user.titre, user.text, threadId];
@@ -52,7 +52,7 @@ router.put("/:threadId", (req, res, next) => {
 
 
 //delete thread
-router.delete("/delete", (req, res, next) => {
+router.delete("/", (req, res, next) => {
     // const mysql = `DELETE FROM thread WHERE idthread = ?`;
     const thread = ({ idthread: req.body.idthread });
     const mysql = 'DELETE FROM thread WHERE idthread = ?';
@@ -81,7 +81,6 @@ router.delete("/delete", (req, res, next) => {
 router.get("/:threadId", (req, res, next) => {
   
   const mysql = 'SELECT * FROM thread WHERE idthread = ?';
-
   const threadId = req.params.threadId;
 
   db.query(
@@ -105,34 +104,28 @@ router.get("/:threadId", (req, res, next) => {
 });
 
 
-//find all thread
+//find all threads
 router.get("/", (req, res, next) => {
-  const mysql = 'SELECT * FROM thread';
 
-  // const user = req.body; 
-  // const data = [user.idthread];
-
-  console.log('toto');
+  const mysql = 'SELECT * FROM thread ORDER BY datePost DESC';//DESC pour afficher les thread par le dernier posté
 
   db.query(
       mysql,
     (err, result) => {
       if (err) {
-        // throw err;
         return res.status(400).send({
           message: err,
         });
       }
-      console.log(result);
-      return res.status(201).send(result)   
+      return res.status(201).send(result);   
     }
   );
   return res.status(201);
 });
 
 
-// //like
-// router.post("/:id/like", (req, res, next) => {});
+//like
+router.post("/:id/like", (req, res, next) => {});
 
 
 module.exports = router;

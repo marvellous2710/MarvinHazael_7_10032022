@@ -100,6 +100,8 @@ router.post("/login", (req, res, next) => {
               message: "Logged ! ",
               token,          
               email: result[0],
+              
+              
             });
           }
           return res.status(401).send({
@@ -138,7 +140,7 @@ router.post("/login", (req, res, next) => {
 // });
 
 
-router.put("/edit", (req, res, next) => {
+router.put("/", (req, res, next) => {
   
   //si pas d'id ça marche quand meme sur postman mais pas dans mysql
   const mysql = 'UPDATE tableuser SET `name` = ?, `firstname` = ?,`profilepicture` = ?, `description`= ? WHERE idtableuser = ?';
@@ -175,10 +177,11 @@ router.delete("/:id", (req, res, next) => {
 
 
 
-
+//find  all users
 router.get("/alluser", (req, res, next) => {
+
   const mysql = 'SELECT * FROM tableuser ';
-  console.log('toto');
+
   db.query(
       mysql,
     (err, result) => {

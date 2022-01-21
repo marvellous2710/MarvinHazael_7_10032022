@@ -11,8 +11,8 @@ const app = express();
 //Security
 app.use(cors());
 app.use(express.json());
-app.use('/api', router);
-app.use('/api', thread);
+app.use('/users', router);
+app.use('/threads', thread);
 
 
 app.listen(PORT,() => console.log('Server running on port ' + PORT));

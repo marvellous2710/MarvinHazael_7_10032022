@@ -1,10 +1,11 @@
 const express = require("express");
-const router  = express.Router();
 const bcrypt  = require("bcryptjs");
 const jwt     = require("jsonwebtoken");
 const db      = require("../lib/db");
 const userMiddleware = require("../middleware/users.js");
 // const { validateRegister } = require("../middleware/users.js");
+
+const router  = express.Router();
 
 // http://localhost:4000/api/sign-up
 router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
@@ -177,7 +178,7 @@ router.delete("/:id", (req, res, next) => {
 
 router.get("/alluser", (req, res, next) => {
   const mysql = 'SELECT * FROM tableuser ';
-  
+  console.log('toto');
   db.query(
       mysql,
     (err, result) => {

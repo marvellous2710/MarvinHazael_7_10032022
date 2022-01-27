@@ -4,7 +4,7 @@ const db      = require("../lib/db");
 
 //add thread
 router.post("/addthread", (req, res, next) => {
-    const mysql = `INSERT INTO thread SET ?`;
+    const mysql  = `INSERT INTO thread SET ?`;
     const thread = ({ titre: req.body.titre, text: req.body.text });
     
     db.query(
@@ -27,34 +27,42 @@ router.post("/addthread", (req, res, next) => {
 //edit thread
 router.put("/:threadId", (req, res, next) => {
 
-  
-  const mysql = 'UPDATE thread SET `titre` = ? , `text` = ? WHERE idthread = ?';
-  const user = req.body; 
-  const threadId = req.params.threadId;
-  const data = [user.titre, user.text, threadId];
+  //const mysql    = 'UPDATE thread SET `titre` = ? , `text` = ? WHERE idthread = ?';
 
-    
-    db.query(
-        mysql, data,
-      (err, result) => {
+  const idTh = req.params.id;
+  const mysql    = `UPDATE thread SET titre = ? WHERE idTh = ${idTh}`;
+  const user     = req.body;
+  const data     = [user.titre, user.text, req.params.threadId];
+  //const idThread = ({ idthread: req.params.threadId }, { ...req.body, idthread: req.params.threadId });
+   
+    db.query(mysql, data, (err, result) => {
         if (err) {
           throw err;
           return res.status(400).send({
             message: err,
           });
-        }
-        return res.status(201).send({ 
-          message: "Thread modified !",
+        } 
+
+        // if (idThread == idThread) {
+        //   return res.status(201).send({          
+        //     message: "Thread modified !"
+        //   });
+        // }
+
+        return res.status(201).send({          
+          message: "Thread modified !"
         });
+        
       }
     );
 });
 
 
+
 //delete thread
 router.delete("/", (req, res, next) => {
     // const mysql = `DELETE FROM thread WHERE idthread = ?`;
-    const thread = ({ idthread: req.body.idthread });
+    // const thread = ({ idthread: req.body.idthread });
     const mysql = 'DELETE FROM thread WHERE idthread = ?';
 
     const user = req.body; 
@@ -80,7 +88,7 @@ router.delete("/", (req, res, next) => {
 //find one thread
 router.get("/:threadId", (req, res, next) => {
   
-  const mysql = 'SELECT * FROM thread WHERE idthread = ?';
+  const mysql    = 'SELECT * FROM thread WHERE idthread = ?';
   const threadId = req.params.threadId;
 
   db.query(
@@ -95,7 +103,7 @@ router.get("/:threadId", (req, res, next) => {
     console.log(result);
     if (result.length === 0) {
       return res.status(404).send({
-        message : `thread not found ${threadId}`
+        message : `Thread not found ${threadId}`
       });
     }
     return res.status(201).send(result[0]);
@@ -119,7 +127,7 @@ router.get("/", (req, res, next) => {
       }
       return res.status(201).send(result);   
     }
-  );
+  );   
   return res.status(201);
 });
 

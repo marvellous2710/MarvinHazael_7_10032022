@@ -16,20 +16,15 @@
         <input type="password" class="form-control" v-model="password" />
       </div>
 
-      <!-- <div class="form-row" v-if="mode == 'login' && status == 'error_login'">
-                Adresse mail et/ou mot de passe invalide
-            </div> -->
+    
       <div class="mt-3">
-        <!-- <button type="submit" class="button button--disabled" >Se connecter -->
         <button
           type="submit"
-          class="button"
-          :class="{ 'button--disabled': !validateFields }"
+          class="btn btn-primary"        
         >
-          Se connecter
-          <span v-if="status == 'loading'">Connexion en cours...</span>
-          <!-- <span v-else>Connexion</span> -->
+          Se connecter      
         </button>
+
       </div>
     </form>
   </div>
@@ -38,7 +33,7 @@
 <script>
 import axios from "axios";
 import { instance } from "../api";
-import { mapState } from "vuex";
+
 
 export default {
   data() {
@@ -57,7 +52,7 @@ export default {
         return false;
       }
     },
-    ...mapState(["status"]),
+   
   },
   methods: {
     onLogin() {
@@ -66,16 +61,19 @@ export default {
         .then((response) => {
           this.isSuccess = true;
           this.$router.push("/");
+
+          localStorage.setItem("user-info", JSON.stringify(this.email));
+
           console.log(response);
         });
     },
-    submitComment() {
-      axios.post("/comments", {
-        content: this.comment,
-      });
+    // submitComment() {
+    //   axios.post("/comments", {
+    //     content: this.comment,
+    //   });
 
-      console.log(this.comment);
-    },
+    //   console.log(this.comment);
+    // },
   },
 };
 </script>

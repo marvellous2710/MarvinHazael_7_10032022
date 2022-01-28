@@ -6,6 +6,3 @@ export const instance  = axios.create({
   baseURL:  `http://${CONFIG.VUE_APP_API_URL}/users/`  
 });
 
-// export const instance  = axios.create({
-//   baseURL:  `http://${CONFIG.VUE_APP_API_URL}/threads/`  
-// });

@@ -15,18 +15,18 @@
 
     <h1>{{ msg }}</h1>
 
-  <div class="alert alert-success" v-if="isSuccess">
+  <!-- <div class="alert alert-success" v-if="isSuccess">
       Post Created Successfully
-    </div>
+    </div> -->
     <form @submit.prevent="postThread">
       <div class="form-group">
-        <input type="text" class="form-control" v-model="threadPost" placeholder="Poster un commentaire ..."/>
+        <input type="text" class="postThread" v-model="threadPost" placeholder="Poster un commentaire ..."/>
       </div>
       <div class="mt-3">
         <button type="submit" class="btn btn-primary">Poster</button>
       </div>
       
-      </form>
+    </form>
 
     <div :key="threads" v-for="threads in threads"> 
       <div class="container">
@@ -38,36 +38,41 @@
       </div>
     </div>
 
-    
+   
     
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import { instance } from "../api";
+
 export default {
   name: "HelloWorld",
 
   data() {
     return {
-      threads: null,
+      threads: "",
+      threadPost: "",
     };
   },
   created() {
-    axios.get("http://localhost:4000/threads/").then((reponse) => {
+    instance.get("http://localhost:4000/threads/").then((reponse) => {
       this.threads = reponse.data;
       console.log(this.threads);
     });
   },
-  postThread() {
-    instance
-      .post(`/addthread`, { threadPost: this.threadPost })
-        then((response) => {
-          this.isSuccess = true;
+  methods: {
+    postThread() {
+      instance
+        .post(("http://localhost:4000/threads/addthread"), { text: this.threadPost })
+        .then((response) => {
+          this.$router.push("/");
+          // this.isSuccess = true;
           console.log(response);
         });
     },
-
+  },
   props: {
     msg: String,
   },
@@ -109,9 +114,24 @@ a {
   float: right;
 }
 
+.menu a:hover {
+  color: red;
+  border: solid 1px violet;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
 .menu a {
   color: whitesmoke;
   margin-right: 20px;
+}
+
+.postThread{
+
+  padding: 5px;
+  border-radius: 5px;
+  margin: 4px auto;
+  width: 50%;
 }
 
 /* ---------------------- CARDS ------------------------------*/
@@ -123,6 +143,8 @@ a {
   margin: 4px auto;
   width: 50%;
 }
+
+
 
 .subforum-column {
   border-radius: 5px;

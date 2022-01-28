@@ -7,7 +7,7 @@ const userMiddleware = require("../middleware/users.js");
 
 const router  = express.Router();
 
-// http://localhost:4000/api/sign-up
+// http://localhost:4000/api/signup
 router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
 
     const user = ({ email: req.body.email });
@@ -29,7 +29,7 @@ router.post("/signup", userMiddleware.validateRegister, (req, res, next) => {
           } else {    
             const user = ({ email: req.body.email, password: hash });
             const mysql = `INSERT INTO tableUser SET ?`;
-           
+      
             db.query(
                 mysql,
                 user ,

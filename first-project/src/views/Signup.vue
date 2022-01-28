@@ -4,7 +4,7 @@
     <hr />
 
     <div class="alert alert-success" v-if="isSuccess">
-      Account Created Successfully
+      Compte utilisateur crée !
     </div>
     <form @submit.prevent="onCreateUser">
       <div class="form-group">
@@ -71,13 +71,13 @@ export default {
           console.log(response);
         });
     },
-    submitComment() {
-      axios.post("/comments", {
-        content: this.comment,
-      });
+    // submitComment() {
+    //   axios.post("/comments", {
+    //     content: this.comment,
+    //   });
 
-      console.log(this.comment);
-    },
+    //   console.log(this.comment);
+    // },
   },
 };
 </script>

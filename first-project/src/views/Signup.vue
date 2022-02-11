@@ -59,7 +59,7 @@ export default {
   methods: {
     onCreateUser() {
       instance
-        .post(`/signup`, {
+        .post(`/users/signup`, {
           name: this.name,
           firstname: this.firstname,
           email: this.email,
@@ -67,7 +67,7 @@ export default {
         })
         .then((response) => {
           this.isSuccess = true;
-
+          this.$router.push("/login");
           console.log(response);
         });
     },

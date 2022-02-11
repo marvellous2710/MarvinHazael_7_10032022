@@ -2,26 +2,13 @@ const express = require("express");
 const router  = express.Router();
 const db      = require("../lib/db");
 
+const auth    = require('../middleware/auth');
+const multer  = require('../middleware/multer-config');
+
+const threadCtrl = require('../controllers/thread');
+
 //add thread
-router.post("/addthread", (req, res, next) => {
-    const mysql  = `INSERT INTO thread SET ?`;
-    const thread = ({ titre: req.body.titre, text: req.body.text });
-    
-    db.query(
-        mysql, thread,
-      (err, result) => {
-        if (err) {
-          throw err;
-          return res.status(400).send({
-            message: err,
-          });
-        }
-        return res.status(201).send({ 
-          message: "Thread registred !",
-        });
-      }
-    );
-});
+router.post("/threads", auth, threadCtrl.createThread);
 
 
 //edit thread
@@ -29,7 +16,7 @@ router.put("/:threadId", (req, res, next) => {
 
   //const mysql    = 'UPDATE thread SET `titre` = ? , `text` = ? WHERE idthread = ?';
 
-  const idTh = req.params.id;
+  const idTh    = req.params.id;
   const mysql    = `UPDATE thread SET titre = ? WHERE idTh = ${idTh}`;
   const user     = req.body;
   const data     = [user.titre, user.text, req.params.threadId];
@@ -60,7 +47,7 @@ router.put("/:threadId", (req, res, next) => {
 
 
 //delete thread
-router.delete("/", (req, res, next) => {
+router.delete("/", auth, (req, res, next) => {
     // const mysql = `DELETE FROM thread WHERE idthread = ?`;
     // const thread = ({ idthread: req.body.idthread });
     const mysql = 'DELETE FROM thread WHERE idthread = ?';
@@ -86,7 +73,7 @@ router.delete("/", (req, res, next) => {
 
 
 //find one thread
-router.get("/:threadId", (req, res, next) => {
+router.get("/:threadId", auth, (req, res, next) => {
   
   const mysql    = 'SELECT * FROM thread WHERE idthread = ?';
   const threadId = req.params.threadId;
@@ -115,7 +102,13 @@ router.get("/:threadId", (req, res, next) => {
 //find all threads
 router.get("/", (req, res, next) => {
 
-  const mysql = 'SELECT * FROM thread ORDER BY datePost DESC';//DESC pour afficher les thread par le dernier posté
+  const size = req.query.size;
+  const pageNumber = req.query.page;
+  const offset = (pageNumber - 1) * size;
+
+  //const mysql = `SELECT * FROM thread LIMIT 1 OFFSET 0`;//DESC pour afficher les thread par le dernier posté
+  //const mysql = `SELECT * FROM thread ORDER BY datePost DESC LIMIT 5 OFFSET ${yo += 10}`;
+  const mysql = `SELECT * FROM thread ORDER BY datePost DESC LIMIT ${size} OFFSET ${offset}`;
 
   db.query(
       mysql,
@@ -133,7 +126,7 @@ router.get("/", (req, res, next) => {
 
 
 //like
-router.post("/:id/like", (req, res, next) => {});
+router.post("/:id/like", auth, (req, res, next) => {});
 
 
 module.exports = router;

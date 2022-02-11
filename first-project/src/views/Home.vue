@@ -2,11 +2,10 @@
   <div class="home">
     <img alt="Vue logo" src="../assets/icongroupomania7.png">
    
-    <HelloWorld msg="Welcome to Groupomania"/>
+    <HelloWorld msg=""/>
 
   <div>
-  
-    
+ 
   </div>
 
   </div>
@@ -30,17 +29,7 @@ export default {
       threads: null,
     }
   },
-  // created(){
-  //     axios.get('http://localhost:4000/threads/')
-  //     .then((reponse) => {
-  //       this.threads = reponse.data;
-  //       console.log(this.threads)
-  //     });
-  // },
-  
-  // created(){
-  //   axios.get('http://localhost:4000/threads/').then(response => console.log(response));
-  // }
+
 }
 </script>
 

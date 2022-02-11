@@ -57,23 +57,16 @@ export default {
   methods: {
     onLogin() {
       instance
-        .post(`/login`, { email: this.email, password: this.password })
+        .post(`/users/login`, { email: this.email, password: this.password })
         .then((response) => {
+          // response.data.token => A stocker, soit dans cookie soit dans localStorage
           this.isSuccess = true;
           this.$router.push("/");
-
-          localStorage.setItem("user-info", JSON.stringify(this.email));
 
           console.log(response);
         });
     },
-    // submitComment() {
-    //   axios.post("/comments", {
-    //     content: this.comment,
-    //   });
-
-    //   console.log(this.comment);
-    // },
+  
   },
 };
 </script>

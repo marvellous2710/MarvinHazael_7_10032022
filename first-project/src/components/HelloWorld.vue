@@ -1,50 +1,81 @@
 <template>
-
   <div class="hello">
     <header class="container-fluid header">
       <div class="container">
         <a href="#" class="logo">Groupomania</a>
         <nav class="menu">
-          <a href="#">Home</a>
-          <a href="#about">Mon profil</a>
-          <a href="#portofolio">Portofolio</a>
-          <a href="#contact">Déconnexion</a>
+          <a href="#"><i class="fas fa-globe"></i></a>
+          <a href="#about"><i class="fas fa-user-alt"></i></a>
+          <a href="#notification"><i class="fas fa-bell"></i></a>
+          <a href="#contact"><i class="fas fa-sign-out-alt"></i></a>
         </nav>
       </div>
     </header>
 
-    <h1>{{ msg }}</h1>
-
-  <!-- <div class="alert alert-success" v-if="isSuccess">
-      Post Created Successfully
-    </div> -->
     <form @submit.prevent="postThread">
-      <div class="form-group">
-        <input type="text" class="postThread" v-model="threadPost" placeholder="Poster un commentaire ..."/>
-      </div>
-      <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Poster</button>
-      </div>
-      
-    </form>
+      <div class="cardThread">
+        <input
+          type="text"
+          class="postThread"
+          v-model="threadPost"
+          placeholder="Poster un commentaire ..."
+        />
 
-    <div :key="threads" v-for="threads in threads"> 
-      <div class="container">
-        <div class="cards">
-          <p>User : {{ threads.titre }}</p>
-          <p>Content :{{ threads.text }}</p>
-          <p>Posté le : {{ threads.datePost }}</p>
+        <div class="mt-3">
+          <button type="submit" class="btn btn-primary">Publier</button>
+          <i class="fas fa-photo-video"></i>
+        </div>
+        <!-- <div class="mt-3">
+          <button type="submit" class="btn btn-primary">Créer un post </button>
+        </div> -->
+      </div>
+    </form>
+    <div class="container">
+      <div class="containerLabel">
+        <div
+          class="lapizzadelamamma"
+          :key="categories"
+          v-for="categories in categories"
+        >
+          <a href="#"
+            ><div class="label">
+              {{ categories.label }}
+            </div></a
+          >
+        </div>
+      </div>
+
+      <div :key="threads" v-for="threads in threads">
+        <div class="containerThread">
+          <div class="cards">
+            <div class="userId">User : {{ threads.userId }}</div>
+            <div class="titre">Titre : {{ threads.titre }}</div>
+            <div class="content">Content : {{ threads.text }}</div>
+            <div class="date">Posté le : {{ threads.datePost }}</div>
+
+            <form @submit.prevent="postThread">
+              <div class="cardThread">
+                <input
+                  type="text"
+                  class="postThread"
+                  v-model="threadPost"
+                  placeholder="Répondre ..."
+                />
+
+                <div class="mt-3">
+                  <button type="submit" class="btn btn-primary">Publier</button>
+                  <i class="fas fa-photo-video"></i>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-
-   
-    
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import { instance } from "../api";
 
 export default {
@@ -52,24 +83,55 @@ export default {
 
   data() {
     return {
+      categories: "",
       threads: "",
       threadPost: "",
     };
   },
+
   created() {
-    instance.get("http://localhost:4000/threads/").then((reponse) => {
+    this.page = 1;
+
+    instance.get("/threads/?page=1&size=5").then((reponse) => {
       this.threads = reponse.data;
       console.log(this.threads);
     });
+
+    document.addEventListener.call(window, "scroll", (event) => {
+      const scrollValue =
+        (window.innerHeight + window.scrollY) / document.body.offsetHeight;
+
+      if (scrollValue == 1) {
+        this.threads;
+        this.page = this.page + 1;
+        console.log(this.page);
+
+        instance.get(`/threads/?page=${this.page}&size=5`).then((reponse) => {
+          this.threads = this.threads.concat(reponse.data);
+          console.log(this.threads);
+        });
+      }
+    });
+
+    instance.get("/category").then((reponse) => {
+      this.categories = reponse.data;
+    });
   },
+
   methods: {
     postThread() {
       instance
-        .post(("http://localhost:4000/threads/addthread"), { text: this.threadPost })
+        .post("/threads/threads", {
+          text: this.threadPost,
+        })
         .then((response) => {
-          this.$router.push("/");
-          // this.isSuccess = true;
           console.log(response);
+          this.$router.go();
+          // this.isSuccess = true;
+        })
+        .catch((error) => {
+          console.log("erreur:");
+          console.log(error);
         });
     },
   },
@@ -81,21 +143,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-
 .header {
   background-color: #022c63;
   height: 70px;
@@ -126,12 +173,55 @@ a {
   margin-right: 20px;
 }
 
-.postThread{
+.containerLabel {
+  display: flex;
+  border-radius: 5px;
+  margin: 4px auto;
+  width: 40%;
+}
 
+.label {
+  background-color: #022c63;
+  margin-right: 10px;
+}
+
+.label:hover {
+  background-color: whitesmoke;
+  color: #022c63;
+}
+
+.lapizzadelamamma a {
+  text-decoration: none;
+}
+
+/* .label a {
+  color: whitesmoke;
+  text-decoration: none;
+}
+
+.label a:hover {
+  color: #022c63;
+} */
+
+.cardThread {
+  background-color: whitesmoke;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
   padding: 5px;
   border-radius: 5px;
   margin: 4px auto;
-  width: 50%;
+  width: 40%;
+  display: flex;
+}
+
+.cardThread input {
+  border: none;
+}
+
+.postThread {
+  padding: 5px;
+  border-radius: 50px;
+  margin: 4px auto;
+  width: 40%;
 }
 
 /* ---------------------- CARDS ------------------------------*/
@@ -143,8 +233,6 @@ a {
   margin: 4px auto;
   width: 50%;
 }
-
-
 
 .subforum-column {
   border-radius: 5px;

@@ -1,14 +1,13 @@
 const express = require("express");
 const router  = express.Router();
 const db      = require("../lib/db");
-
 const auth    = require('../middleware/auth');
 const multer  = require('../middleware/multer-config');
 
 const threadCtrl = require('../controllers/thread');
 
 //add thread
-router.post("/threads", auth, threadCtrl.createThread);
+router.post("/threads", threadCtrl.createThread);
 
 
 //edit thread

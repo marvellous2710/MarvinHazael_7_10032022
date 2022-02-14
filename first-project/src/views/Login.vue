@@ -55,12 +55,47 @@ export default {
    
   },
   methods: {
-    onLogin() {
+    onLogin() {    
       instance
         .post(`/users/login`, { email: this.email, password: this.password })
         .then((response) => {
+
           // response.data.token => A stocker, soit dans cookie soit dans localStorage
-          this.isSuccess = true;
+        localStorage.setItem('authtoken',response.data.token)
+        
+        
+          //METHODE 1-----------------------------------------------------------------
+        instance.interceptors.request.use((config) => {
+          let token = localStorage.setItem('authtoken',response.data.token);
+
+          if(token){
+            config.headers['Autorization'] = `Bearer ${ token }`;
+            
+          }
+          return config;
+          console.log(config);
+          },
+          (error) => {
+            return Promise.reject(error);
+          }
+        );
+        //FIN DE LA METHODE 1-----------------------------------------------------------------
+
+        //METHODE 2
+        // const accessToken = 'oiaznf^"nigêirgnaêrgnaerg^noâze';
+
+        // axios.interceptors.request.use(
+        //   config => {
+        //     config.headers.authorization = `Bearer ${accessToken}` ;
+        //   },
+        //   error => {
+        //     return Promise.reject(error);
+        //   }
+        // );
+        // //FIN METHODE 2
+
+
+          // this.isSuccess = true;
           this.$router.push("/");
 
           console.log(response);

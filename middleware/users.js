@@ -15,6 +15,7 @@ module.exports = {
         message: "Please enter a password with min. 6 chars",
       });
     }
+
   
     next();
   },

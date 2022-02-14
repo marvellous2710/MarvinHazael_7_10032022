@@ -51,7 +51,7 @@
             <div class="userId">User : {{ threads.userId }}</div>
             <div class="titre">Titre : {{ threads.titre }}</div>
             <div class="content">Content : {{ threads.text }}</div>
-            <div class="date">Posté le : {{ threads.datePost }}</div>
+            <div class="date">Posté le : {{ getFormatedDate(threads.datePost) }}</div>
 
             <form @submit.prevent="postThread">
               <div class="cardThread">
@@ -77,6 +77,9 @@
 
 <script>
 import { instance } from "../api";
+import moment from 'moment';
+
+
 
 export default {
   name: "HelloWorld",
@@ -92,10 +95,13 @@ export default {
   created() {
     this.page = 1;
 
-    instance.get("/threads/?page=1&size=5").then((reponse) => {
-      this.threads = reponse.data;
-      console.log(this.threads);
-    });
+    instance
+      .get("/threads/?page=1&size=5")
+      .then((reponse) => {
+        this.threads = reponse.data;
+        console.log(this.threads);
+      })
+      .catch((error) => console.log(error));
 
     document.addEventListener.call(window, "scroll", (event) => {
       const scrollValue =
@@ -132,12 +138,18 @@ export default {
         .catch((error) => {
           console.log("erreur:");
           console.log(error);
-        });
+        });       
+    },
+    getFormatedDate(date){
+        return moment(String(date)).format('DD/MM/YYYY hh:mm')
     },
   },
+
+
   props: {
     msg: String,
   },
+  
 };
 </script>
 
@@ -171,6 +183,10 @@ export default {
 .menu a {
   color: whitesmoke;
   margin-right: 20px;
+}
+
+.hello{
+  background: darkgray;
 }
 
 .containerLabel {

@@ -71,13 +71,7 @@ export default {
           console.log(response);
         });
     },
-    // submitComment() {
-    //   axios.post("/comments", {
-    //     content: this.comment,
-    //   });
-
-    //   console.log(this.comment);
-    // },
+   
   },
 };
 </script>

@@ -12,13 +12,16 @@ exports.login = (req, res, next) => {
       mysql,user,
       (err, result) => {
         if (err) {
-          throw err;
+          // throw err;
           return res.status(400).send({
             message: err,
           });
         }
+
         if (!result.length) {
+       
           return res.status(400).send({
+            
             message: "Email or password incorrect !",
           });
         }
@@ -28,15 +31,15 @@ exports.login = (req, res, next) => {
           result[0]["password"],
           (bErr, bResult) => {
             if (bErr) {
-              throw bErr;
+              // throw bErr;
               return res.status(400).send({
                 message: "Email or password incorrect !",
               });
             }
             if (bResult) {
                 //password match
-                const token = jwt.sign(
-                  {
+                
+                const token = jwt.sign({
                     email: result[0].username,
                     idtableUser: result[0].idtableUser,
                   },
@@ -45,7 +48,7 @@ exports.login = (req, res, next) => {
                 );
                 return res.status(200).send({
                   message: "Logged ! ",
-                  token,          
+                  token      
                   //email: result[0],
                   
                   

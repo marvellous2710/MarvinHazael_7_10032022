@@ -3,9 +3,10 @@
     <h2>Connexion</h2>
     <hr />
 
-    <div class="alert alert-success" v-if="isSuccess">
-      Post Created Successfully
+    <div class="alert alert-danger" v-if="isWrong">
+      Mot de passe et/ou email incorrect
     </div>
+
     <form @submit.prevent="onLogin">
       <div class="form-group">
         <label>Email</label>
@@ -16,15 +17,8 @@
         <input type="password" class="form-control" v-model="password" />
       </div>
 
-    
       <div class="mt-3">
-        <button
-          type="submit"
-          class="btn btn-primary"        
-        >
-          Se connecter      
-        </button>
-
+        <button type="submit" class="btn btn-primary">Se connecter</button>
       </div>
     </form>
   </div>
@@ -34,14 +28,13 @@
 import axios from "axios";
 import { instance } from "../api";
 
-
 export default {
   data() {
     return {
       email: "",
       password: "",
-      isSuccess: false,
       comment: "",
+      isWrong: false,
     };
   },
   computed: {
@@ -52,56 +45,40 @@ export default {
         return false;
       }
     },
-   
   },
   methods: {
-    onLogin() {    
+    onLogin() {
       instance
         .post(`/users/login`, { email: this.email, password: this.password })
         .then((response) => {
 
-          // response.data.token => A stocker, soit dans cookie soit dans localStorage
-        localStorage.setItem('authtoken',response.data.token)
-        
-        
-          //METHODE 1-----------------------------------------------------------------
-        instance.interceptors.request.use((config) => {
-          let token = localStorage.setItem('authtoken',response.data.token);
-
-          if(token){
-            config.headers['Autorization'] = `Bearer ${ token }`;
+          localStorage.setItem('authToken',response.data.token)
+          
+       
+          instance.interceptors.request.use(
+            (config) => {
+              
+              let token = localStorage.getItem("authToken");
             
-          }
-          return config;
-          console.log(config);
-          },
-          (error) => {
-            return Promise.reject(error);
-          }
-        );
-        //FIN DE LA METHODE 1-----------------------------------------------------------------
+              if (token) {
+                config.headers["Authorization"] = `Bearer ${token}`;
+              }
+              return config;
+            },
+            (error) => {
+              
+              return Promise.reject(error);
+            }
+          );
 
-        //METHODE 2
-        // const accessToken = 'oiaznf^"nigêirgnaêrgnaerg^noâze';
-
-        // axios.interceptors.request.use(
-        //   config => {
-        //     config.headers.authorization = `Bearer ${accessToken}` ;
-        //   },
-        //   error => {
-        //     return Promise.reject(error);
-        //   }
-        // );
-        // //FIN METHODE 2
-
-
-          // this.isSuccess = true;
           this.$router.push("/");
 
           console.log(response);
+        })
+        .catch((error) => {
+          this.isWrong = true;
         });
     },
-  
   },
 };
 </script>

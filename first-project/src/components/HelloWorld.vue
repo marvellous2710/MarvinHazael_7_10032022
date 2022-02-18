@@ -2,15 +2,17 @@
   <div class="hello">
     <header class="container-fluid header">
       <div class="container">
-        <a href="#" class="logo">Groupomania</a>
+        <a href="#home" class="logo">Groupomania</a>
         <nav class="menu">
           <a href="#"><i class="fas fa-globe"></i></a>
-          <a href="#about"><i class="fas fa-user-alt"></i></a>
+          <a href="#profile"><i class="fas fa-user-alt"></i></a>
           <a href="#notification"><i class="fas fa-bell"></i></a>
-          <a href="#contact"><i class="fas fa-sign-out-alt"></i></a>
+          <a @click.prevent="disconnect"><i class="fas fa-sign-out-alt"></i></a>
+       
         </nav>
       </div>
     </header>
+    
 
     <form @submit.prevent="postThread">
       <div class="cardThread">
@@ -23,11 +25,9 @@
 
         <div class="mt-3">
           <button type="submit" class="btn btn-primary">Publier</button>
-          <i class="fas fa-photo-video"></i>
+          <div class="buttonUpload"><input name="transfertFile" type="file" @change="onFileSelected"></div>
+          
         </div>
-        <!-- <div class="mt-3">
-          <button type="submit" class="btn btn-primary">Créer un post </button>
-        </div> -->
       </div>
     </form>
     <div class="container">
@@ -51,7 +51,9 @@
             <div class="userId">User : {{ threads.userId }}</div>
             <div class="titre">Titre : {{ threads.titre }}</div>
             <div class="content">Content : {{ threads.text }}</div>
-            <div class="date">Posté le : {{ getFormatedDate(threads.datePost) }}</div>
+            <div class="date">
+              Posté le : {{ getFormatedDate(threads.datePost) }}
+            </div>
 
             <form @submit.prevent="postThread">
               <div class="cardThread">
@@ -64,7 +66,9 @@
 
                 <div class="mt-3">
                   <button type="submit" class="btn btn-primary">Publier</button>
-                  <i class="fas fa-photo-video"></i>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-photo-video"></i>
+                  </button>
                 </div>
               </div>
             </form>
@@ -77,22 +81,43 @@
 
 <script>
 import { instance } from "../api";
-import moment from 'moment';
+import moment from "moment";
+import axios from 'axios';
 
 
 
 export default {
   name: "HelloWorld",
 
+
+
   data() {
     return {
       categories: "",
       threads: "",
       threadPost: "",
+      selectedFile: null
     };
   },
 
+
   created() {
+    //   instance.get('/threads/threads', {
+    //   headers: {
+    //     Authorization: "Bearer" + localStorage.getItem('authToken')
+    //   }
+    
+    // })
+    // .then(response => {
+    //     console.log(response);
+    //     this.threads = response.data
+       
+    // })
+    // .catch((error) => {
+    
+    //   console.log(error);
+    // });
+
     this.page = 1;
 
     instance
@@ -133,23 +158,27 @@ export default {
         .then((response) => {
           console.log(response);
           this.$router.go();
-          // this.isSuccess = true;
         })
         .catch((error) => {
-          console.log("erreur:");
           console.log(error);
-        });       
+        });
     },
-    getFormatedDate(date){
-        return moment(String(date)).format('DD/MM/YYYY hh:mm')
+    getFormatedDate(date) {
+      return moment(String(date)).format("DD/MM/YYYY hh:mm");     
     },
+    onFileSelected(event){
+      this.selectedFile = event.target.files[0]
+    },
+    disconnect(){
+      localStorage.clear();
+    },
+    
+    
   },
-
 
   props: {
     msg: String,
   },
-  
 };
 </script>
 
@@ -185,7 +214,7 @@ export default {
   margin-right: 20px;
 }
 
-.hello{
+.hello {
   background: darkgray;
 }
 
@@ -210,14 +239,6 @@ export default {
   text-decoration: none;
 }
 
-/* .label a {
-  color: whitesmoke;
-  text-decoration: none;
-}
-
-.label a:hover {
-  color: #022c63;
-} */
 
 .cardThread {
   background-color: whitesmoke;

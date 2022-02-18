@@ -7,7 +7,7 @@ const multer  = require('../middleware/multer-config');
 const threadCtrl = require('../controllers/thread');
 
 //add thread
-router.post("/threads", threadCtrl.createThread);
+router.post("/threads", multer, threadCtrl.createThread);
 
 
 //edit thread

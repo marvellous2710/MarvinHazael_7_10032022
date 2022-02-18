@@ -10,7 +10,7 @@ exports.createThread = (req, res, next) => {
     
     db.query(
         mysql, thread,
-        //mysql, Object.values(thread),
+     
       (err, result) => {
         if (err) {
           throw err;
@@ -24,3 +24,5 @@ exports.createThread = (req, res, next) => {
       }
     );
 }
+
+

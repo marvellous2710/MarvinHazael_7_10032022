@@ -99,7 +99,7 @@ router.get("/:threadId", auth, (req, res, next) => {
 
 
 //find all threads
-router.get("/", (req, res, next) => {
+router.get("/", auth,  (req, res, next) => {
 
   const size = req.query.size;
   const pageNumber = req.query.page;

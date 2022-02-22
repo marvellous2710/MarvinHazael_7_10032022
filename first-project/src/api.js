@@ -6,7 +6,10 @@ console.log(CONFIG);
 
 export const instance = axios.create({
   baseURL: `http://${CONFIG.VUE_APP_API_URL}/`,
+  
 });
+
+
 
 instance.interceptors.request.use(
   (config) => {
@@ -15,9 +18,15 @@ instance.interceptors.request.use(
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => {
+    
     return Promise.reject(error);
+    
   }
 );
+
+
+

@@ -3,9 +3,8 @@ const jwt     = require("jsonwebtoken");
 const db      = require("../lib/db");
 
 exports.createThread = (req, res, next) => {
-    //const mysql  = `INSERT INTO thread SET ?`;
+    
     const mysql = `INSERT INTO thread SET ?`;
-    //const mysql = `INSERT INTO thread (titre, text) SET ?`;
     const thread = { titre: req.body.titre, text: req.body.text};
     
     db.query(

@@ -8,11 +8,9 @@
           <a href="#profile"><i class="fas fa-user-alt"></i></a>
           <a href="#notification"><i class="fas fa-bell"></i></a>
           <a @click.prevent="disconnect"><i class="fas fa-sign-out-alt"></i></a>
-       
         </nav>
       </div>
     </header>
-    
 
     <form @submit.prevent="postThread">
       <div class="cardThread">
@@ -24,12 +22,21 @@
         />
 
         <div class="mt-3">
-          <button type="submit" class="btn btn-primary">Publier</button>
-          <div class="buttonUpload"><input name="transfertFile" type="file" @change="onFileSelected"></div>
-          
+          <!-- <button type="submit" class="btn btn-primary" :class="{'button--disabled' : !bouton()}" >Publier</button> -->
+          <button
+            type="submit"
+            class="btn btn-primary"
+            :disabled="!threadPost.length"
+          >
+            Publier
+          </button>
+          <div class="buttonUpload">
+            <input name="transfertFile" type="file" @change="onFileSelected" />
+          </div>
         </div>
       </div>
     </form>
+
     <div class="container">
       <div class="containerLabel">
         <div
@@ -50,7 +57,7 @@
           <div class="cards">
             <div class="userId">User : {{ threads.userId }}</div>
             <div class="titre">Titre : {{ threads.titre }}</div>
-            <div class="content">Content : {{ threads.text }}</div>
+            <div class="content">Text : {{ threads.text }}</div>
             <div class="date">
               Posté le : {{ getFormatedDate(threads.datePost) }}
             </div>
@@ -82,42 +89,21 @@
 <script>
 import { instance } from "../api";
 import moment from "moment";
-import axios from 'axios';
-
-
+import axios from "axios";
 
 export default {
   name: "HelloWorld",
-
-
 
   data() {
     return {
       categories: "",
       threads: "",
       threadPost: "",
-      selectedFile: null
+      selectedFile: null,
     };
   },
 
-
   created() {
-    //   instance.get('/threads/threads', {
-    //   headers: {
-    //     Authorization: "Bearer" + localStorage.getItem('authToken')
-    //   }
-    
-    // })
-    // .then(response => {
-    //     console.log(response);
-    //     this.threads = response.data
-       
-    // })
-    // .catch((error) => {
-    
-    //   console.log(error);
-    // });
-
     this.page = 1;
 
     instance
@@ -126,7 +112,9 @@ export default {
         this.threads = reponse.data;
         console.log(this.threads);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error.response.status);
+      });
 
     document.addEventListener.call(window, "scroll", (event) => {
       const scrollValue =
@@ -149,6 +137,30 @@ export default {
     });
   },
 
+  computed: {
+    bouton: function () {
+      if (this.threadPost != "") {
+        return true;
+      } else {
+        // btnDisabled = false;
+        return false;
+      }
+    },
+  },
+
+  // computed: {
+  //    bouton: function () {
+  //     if(this.threadPost != ''){
+  //       return btnDisabled = true;
+
+  //     } else {
+
+  //       // btnDisabled = false;
+  //       return btnDisabled = false;
+  //     }
+  //   }
+  // },
+
   methods: {
     postThread() {
       instance
@@ -164,16 +176,25 @@ export default {
         });
     },
     getFormatedDate(date) {
-      return moment(String(date)).format("DD/MM/YYYY hh:mm");     
+      return moment(String(date)).format("DD/MM/YYYY hh:mm");
     },
-    onFileSelected(event){
-      this.selectedFile = event.target.files[0]
+    onFileSelected(event) {
+      this.selectedFile = event.target.files[0];
     },
-    disconnect(){
-      localStorage.clear();
+    disconnect() {
+      localStorage.removeItem("authToken"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
+      this.$router.push("/login");
     },
-    
-    
+    // bouton(){
+    //   if(this.threadPost != ''){
+    //     return btnDisabled = true;
+
+    //   } else {
+
+    //     // btnDisabled = false;
+    //     return btnDisabled = false;
+    //   }
+    // }
   },
 
   props: {
@@ -238,7 +259,6 @@ export default {
 .lapizzadelamamma a {
   text-decoration: none;
 }
-
 
 .cardThread {
   background-color: whitesmoke;

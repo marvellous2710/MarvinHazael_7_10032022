@@ -17,3 +17,5 @@ app.use('/threads', thread);
 app.use('/category', categories);
 
 app.listen(PORT,() => console.log('Server running on port ' + PORT));
+
+

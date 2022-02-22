@@ -52,24 +52,8 @@ export default {
         .post(`/users/login`, { email: this.email, password: this.password })
         .then((response) => {
 
-          localStorage.setItem('authToken',response.data.token)
+          localStorage.setItem('authToken',response.data.token);
           
-       
-          instance.interceptors.request.use(
-            (config) => {
-              
-              let token = localStorage.getItem("authToken");
-            
-              if (token) {
-                config.headers["Authorization"] = `Bearer ${token}`;
-              }
-              return config;
-            },
-            (error) => {
-              
-              return Promise.reject(error);
-            }
-          );
 
           this.$router.push("/");
 

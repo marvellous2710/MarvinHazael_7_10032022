@@ -14,6 +14,22 @@
 
     <form @submit.prevent="postThread">
       <div class="cardThread">
+        <div class="titre">{{ email }}</div>
+
+        
+        <input
+          type="text"
+          class="postThread"
+          v-model="email"
+          
+        />
+
+        <input
+          type="text"
+          class="postThread"
+          v-model="titre"
+          placeholder="Poster un titre ..."
+        />
         <input
           type="text"
           class="postThread"
@@ -22,7 +38,6 @@
         />
 
         <div class="mt-3">
-          <!-- <button type="submit" class="btn btn-primary" :class="{'button--disabled' : !bouton()}" >Publier</button> -->
           <button
             type="submit"
             class="btn btn-primary"
@@ -55,7 +70,7 @@
       <div :key="threads" v-for="threads in threads">
         <div class="containerThread">
           <div class="cards">
-            <div class="userId">User : {{ threads.userId }}</div>
+            <div class="userId">User : {{ threads.email }}</div>
             <div class="titre">Titre : {{ threads.titre }}</div>
             <div class="content">Text : {{ threads.text }}</div>
             <div class="date">
@@ -99,6 +114,8 @@ export default {
       categories: "",
       threads: "",
       threadPost: "",
+      titre: "",
+      email: localStorage.getItem("user"),
       selectedFile: null,
     };
   },
@@ -137,34 +154,13 @@ export default {
     });
   },
 
-  computed: {
-    bouton: function () {
-      if (this.threadPost != "") {
-        return true;
-      } else {
-        // btnDisabled = false;
-        return false;
-      }
-    },
-  },
-
-  // computed: {
-  //    bouton: function () {
-  //     if(this.threadPost != ''){
-  //       return btnDisabled = true;
-
-  //     } else {
-
-  //       // btnDisabled = false;
-  //       return btnDisabled = false;
-  //     }
-  //   }
-  // },
-
   methods: {
     postThread() {
       instance
         .post("/threads/threads", {
+
+          email: this.email,
+          titre: this.titre,
           text: this.threadPost,
         })
         .then((response) => {
@@ -182,19 +178,10 @@ export default {
       this.selectedFile = event.target.files[0];
     },
     disconnect() {
-      localStorage.removeItem("authToken"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
-    // bouton(){
-    //   if(this.threadPost != ''){
-    //     return btnDisabled = true;
-
-    //   } else {
-
-    //     // btnDisabled = false;
-    //     return btnDisabled = false;
-    //   }
-    // }
   },
 
   props: {

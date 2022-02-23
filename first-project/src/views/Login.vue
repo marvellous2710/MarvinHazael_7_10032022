@@ -37,15 +37,7 @@ export default {
       isWrong: false,
     };
   },
-  computed: {
-    validateFields: function () {
-      if (this.email != "" && this.password != "") {
-        return true;
-      } else {
-        return false;
-      }
-    },
-  },
+ 
   methods: {
     onLogin() {
       instance
@@ -53,8 +45,8 @@ export default {
         .then((response) => {
 
           localStorage.setItem('authToken',response.data.token);
+          localStorage.setItem('user',response.data.user.email);
           
-
           this.$router.push("/");
 
           console.log(response);

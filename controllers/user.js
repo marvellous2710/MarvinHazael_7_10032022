@@ -37,8 +37,8 @@ exports.login = (req, res, next) => {
               });
             }
             if (bResult) {
-                //password match
-                
+        
+
                 const token = jwt.sign({
                     email: result[0].username,
                     idtableUser: result[0].idtableUser,
@@ -48,10 +48,9 @@ exports.login = (req, res, next) => {
                 );
                 return res.status(200).send({
                   message: "Logged ! ",
-                  token      
-                  //email: result[0],
-                  
-                  
+                  token,      
+                  user: result[0],
+              
                 });
               }
               return res.status(401).send({

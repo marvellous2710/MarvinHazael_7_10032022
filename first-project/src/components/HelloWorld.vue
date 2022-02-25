@@ -258,11 +258,11 @@ export default {
     postThread() {
       // const formData = new FormData();
       // formData.append("transfertFile", this.data.selectedFile);
-      let formData = new FormData();
-      formData.append("file", this.file);
+      // let formData = new FormData();
+      // formData.append("file", this.file);
 
       instance
-        .post("/threads/threads", formData, {
+        .post("/threads/threads",  {
           email: this.email,
           titre: this.titre,
           text: this.threadPost,

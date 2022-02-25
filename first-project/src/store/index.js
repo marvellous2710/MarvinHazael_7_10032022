@@ -18,6 +18,8 @@ const store = createStore({
       state.user = user;
     }
   },
+
+
   actions: {
     login:({commit}, userInfos) => {
       commit('setStatus', 'loading');

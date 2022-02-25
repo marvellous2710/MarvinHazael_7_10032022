@@ -5,7 +5,7 @@ const db      = require("../lib/db");
 exports.createThread = (req, res, next) => {
     
     const mysql = `INSERT INTO thread SET ?`;
-    const thread = { titre: req.body.titre, text: req.body.text};
+    const thread = { titre: req.body.titre, text: req.body.text, email: req.body.email};
     
     db.query(
         mysql, thread,

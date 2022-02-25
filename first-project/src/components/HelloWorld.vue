@@ -16,13 +16,7 @@
       <div class="cardThread">
         <div class="titre">{{ email }}</div>
 
-        
-        <input
-          type="text"
-          class="postThread"
-          v-model="email"
-          
-        />
+        <input type="text" class="postThread" v-model="email" />
 
         <input
           type="text"
@@ -30,6 +24,11 @@
           v-model="titre"
           placeholder="Poster un titre ..."
         />
+
+        <div>
+          <img :src="imageUrl" height="150" />
+        </div>
+
         <input
           type="text"
           class="postThread"
@@ -37,17 +36,24 @@
           placeholder="Poster un commentaire ..."
         />
 
+        <button raised class="primary" @click="onPickFile">Upload Image</button>
+        <input
+          type="file"
+          ref="fileInput"
+          accept="image/*"
+          @change="onFilePicked"
+        />
         <div class="mt-3">
           <button
             type="submit"
             class="btn btn-primary"
-            :disabled="!threadPost.length"
+            :disabled="!titre.length"
           >
             Publier
           </button>
-          <div class="buttonUpload">
-            <input name="transfertFile" type="file" @change="onFileSelected" />
-          </div>
+          <!-- <div class="buttonUpload">
+            <input name="transfertFile" type="file" accept="image/*" @change="onFileSelected" />
+          </div> -->
         </div>
       </div>
     </form>
@@ -67,17 +73,81 @@
         </div>
       </div>
 
+      <h1>QUATRIEME TEST UPLOAD IMAGE</h1>
+
+      <div class="form-group">
+        <label for="formFile" class="form-label mt-4">Image :</label>
+        <input
+          class="form-control"
+          type="file"
+          id="formFile"
+          @change="handleFileUpload($event)"
+        />
+
+        <div>
+          <img :src="file" height="150" />
+        </div>
+      </div>
+      <!-- <div class="container">
+
+
+      <div>
+        <img :src="imageUrl" height="150">
+      </div>
+
+
+
+      <button raised class="primary" @click="onPickFile">Upload Image</button>
+      <input 
+      type="file" 
+      ref="fileInput" 
+      accept="image/*"
+      @change="onFilePicked"
+      >
+    </div> -->
+
+      <h1>FIN QUATRIEMEUUUH TEST UPLOAD IMAGE</h1>
+
+      <h1>CINSUIEMEM TEST UPLOAD IMAGE</h1>
+
+      <div class="container">
+        <div class="large-12 medium-12 small-12 cell">
+          <label
+            >File
+            <input
+              type="file"
+              name="iciLimage"
+              id="file"
+              ref="file"
+              v-on:change="handleFileUpload()"
+            />
+          </label>
+          <button v-on:click="postThread()">Submit</button>
+        </div>
+      </div>
+
+      <h1>FIN CINQUIEMEM TEST UPLOAD IMAGE</h1>
+
       <div :key="threads" v-for="threads in threads">
         <div class="containerThread">
           <div class="cards">
             <div class="userId">User : {{ threads.email }}</div>
             <div class="titre">Titre : {{ threads.titre }}</div>
+
+            <div class="content">Image : {{ threads.image }}</div>
+
             <div class="content">Text : {{ threads.text }}</div>
             <div class="date">
               Posté le : {{ getFormatedDate(threads.datePost) }}
             </div>
 
-            <form @submit.prevent="postThread">
+            <form @submit.prevent="findOne">
+              <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Répondre</button>
+              </div>
+            </form>
+
+            <!-- <form @submit.prevent="postThread">
               <div class="cardThread">
                 <input
                   type="text"
@@ -93,7 +163,7 @@
                   </button>
                 </div>
               </div>
-            </form>
+            </form> -->
           </div>
         </div>
       </div>
@@ -116,7 +186,11 @@ export default {
       threadPost: "",
       titre: "",
       email: localStorage.getItem("user"),
+      //selectedFile: null,
+      imageUrl: "",
+      image: null,
       selectedFile: null,
+      file: "",
     };
   },
 
@@ -155,20 +229,59 @@ export default {
   },
 
   methods: {
-    postThread() {
-      instance
-        .post("/threads/threads", {
+    // handleFileUpload(event) {
+    //   this.file = event.target.files[0];
+    //   console.log(this.file);
+    // },
 
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0];
+    },
+
+    onPickFile() {
+      this.$refs.fileInput.click();
+    },
+    onFilePicked(event) {
+      const files = event.target.files;
+      let filename = files[0].name;
+      if (filename.lastIndexOf(".") <= 0) {
+        return alert("please add a valid file !");
+      }
+      const fileReader = new FileReader();
+      fileReader.addEventListener("load", () => {
+        this.imageUrl = fileReader.result;
+      });
+      fileReader.readAsDataURL(files[0]);
+      this.image = files[0];
+    },
+
+    postThread() {
+      // const formData = new FormData();
+      // formData.append("transfertFile", this.data.selectedFile);
+      let formData = new FormData();
+      formData.append("file", this.file);
+
+      instance
+        .post("/threads/threads", formData, {
           email: this.email,
           titre: this.titre,
           text: this.threadPost,
+          imageUrl: this.imageUrl,
+          image: this.image,
+          file: this.file,
+
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         })
         .then((response) => {
           console.log(response);
           this.$router.go();
+          console.log("SUCCESS!!");
         })
         .catch((error) => {
           console.log(error);
+          console.log("FAILURE!!");
         });
     },
     getFormatedDate(date) {
@@ -176,11 +289,33 @@ export default {
     },
     onFileSelected(event) {
       this.selectedFile = event.target.files[0];
+      const fileReader = new FileReader();
+      // fileReader.addEventListener('load', () => {
+      //   this.imageUrl = fileReader.result
+      // })
+
+      console.log(this.selectedFile);
     },
     disconnect() {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
+    },
+    findOne() {
+      instance
+        .get("/threads/:threadId", {
+          email: this.email,
+          titre: this.titre,
+          text: this.threadPost,
+        })
+        .then((response) => {
+          console.log(response);
+          //this.$router.go();
+          //this.$router.push("/thread");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   },
 

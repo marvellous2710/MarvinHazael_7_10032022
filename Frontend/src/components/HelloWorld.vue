@@ -36,7 +36,7 @@
           placeholder="Poster un commentaire ..."
         />
 
-        <button raised class="primary" @click="onPickFile">Upload Image</button>
+        <!-- <button raised class="primary" @click="onPickFile">Upload Image</button> -->
         <input
           type="file"
           ref="fileInput"
@@ -73,68 +73,13 @@
         </div>
       </div>
 
-      <h1>QUATRIEME TEST UPLOAD IMAGE</h1>
-
-      <div class="form-group">
-        <label for="formFile" class="form-label mt-4">Image :</label>
-        <input
-          class="form-control"
-          type="file"
-          id="formFile"
-          @change="handleFileUpload($event)"
-        />
-
-        <div>
-          <img :src="file" height="150" />
-        </div>
-      </div>
-      <!-- <div class="container">
-
-
-      <div>
-        <img :src="imageUrl" height="150">
-      </div>
-
-
-
-      <button raised class="primary" @click="onPickFile">Upload Image</button>
-      <input 
-      type="file" 
-      ref="fileInput" 
-      accept="image/*"
-      @change="onFilePicked"
-      >
-    </div> -->
-
-      <h1>FIN QUATRIEMEUUUH TEST UPLOAD IMAGE</h1>
-
-      <h1>CINSUIEMEM TEST UPLOAD IMAGE</h1>
-
-      <div class="container">
-        <div class="large-12 medium-12 small-12 cell">
-          <label
-            >File
-            <input
-              type="file"
-              name="iciLimage"
-              id="file"
-              ref="file"
-              v-on:change="handleFileUpload()"
-            />
-          </label>
-          <button v-on:click="postThread()">Submit</button>
-        </div>
-      </div>
-
-      <h1>FIN CINQUIEMEM TEST UPLOAD IMAGE</h1>
-
       <div :key="threads" v-for="threads in threads">
         <div class="containerThread">
           <div class="cards">
             <div class="userId">User : {{ threads.email }}</div>
             <div class="titre">Titre : {{ threads.titre }}</div>
 
-            <div class="content">Image : {{ threads.image }}</div>
+            <div class="content">Image : {{ threads.imageUrl }}</div>
 
             <div class="content">Text : {{ threads.text }}</div>
             <div class="date">
@@ -146,24 +91,6 @@
                 <button type="submit" class="btn btn-primary">Répondre</button>
               </div>
             </form>
-
-            <!-- <form @submit.prevent="postThread">
-              <div class="cardThread">
-                <input
-                  type="text"
-                  class="postThread"
-                  v-model="threadPost"
-                  placeholder="Répondre ..."
-                />
-
-                <div class="mt-3">
-                  <button type="submit" class="btn btn-primary">Publier</button>
-                  <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-photo-video"></i>
-                  </button>
-                </div>
-              </div>
-            </form> -->
           </div>
         </div>
       </div>
@@ -213,7 +140,7 @@ export default {
 
       if (scrollValue == 1) {
         this.threads;
-        this.page = this.page + 1;
+        ++this.page;
         console.log(this.page);
 
         instance.get(`/threads/?page=${this.page}&size=5`).then((reponse) => {
@@ -229,13 +156,9 @@ export default {
   },
 
   methods: {
-    // handleFileUpload(event) {
-    //   this.file = event.target.files[0];
-    //   console.log(this.file);
-    // },
-
     handleFileUpload() {
       this.file = this.$refs.file.files[0];
+      console.log(this.file);
     },
 
     onPickFile() {
@@ -256,19 +179,16 @@ export default {
     },
 
     postThread() {
-      // const formData = new FormData();
-      // formData.append("transfertFile", this.data.selectedFile);
-      // let formData = new FormData();
-      // formData.append("file", this.file);
+
 
       instance
-        .post("/threads/threads",  {
+        .post("/threads/", {
           email: this.email,
           titre: this.titre,
           text: this.threadPost,
-          imageUrl: this.imageUrl,
+          imageUrl: this.text,
           image: this.image,
-          file: this.file,
+          file: this.text,
 
           headers: {
             "Content-Type": "multipart/form-data",
@@ -290,9 +210,9 @@ export default {
     onFileSelected(event) {
       this.selectedFile = event.target.files[0];
       const fileReader = new FileReader();
-      // fileReader.addEventListener('load', () => {
-      //   this.imageUrl = fileReader.result
-      // })
+      fileReader.addEventListener("load", () => {
+        this.imageUrl = fileReader.result;
+      });
 
       console.log(this.selectedFile);
     },
@@ -301,9 +221,14 @@ export default {
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
-    findOne() {
+
+    //CHANGE-----------------------------------------//
+    findOne(req) {
+      const idthread = req.params.idthread;
+
       instance
-        .get("/threads/:threadId", {
+        .get(`/:threadId/${idthread}`, {
+          // .get("/threads/:threadId", {
           email: this.email,
           titre: this.titre,
           text: this.threadPost,

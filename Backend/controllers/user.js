@@ -1,6 +1,7 @@
 const bcrypt  = require("bcryptjs");
 const jwt     = require("jsonwebtoken");
-const db      = require("../lib/db");
+const db      = require(".../lib/db");
+
 
 
 exports.login = (req, res, next) => {

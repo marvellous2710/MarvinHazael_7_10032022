@@ -12,37 +12,26 @@
       </div>
     </header>
 
-    <form @submit.prevent="postThread">
+    <form
+      @submit.prevent="postThread"
+      enctype="multipart/form-data"
+      id="formulaire"
+    >
       <div class="cardThread">
         <div class="titre">{{ email }}</div>
-
-        <input type="text" class="postThread" v-model="email" />
 
         <input
           type="text"
           class="postThread"
           v-model="titre"
-          placeholder="Poster un titre ..."
+          placeholder="Poster ..."
         />
 
         <div>
           <img :src="imageUrl" height="150" />
         </div>
 
-        <input
-          type="text"
-          class="postThread"
-          v-model="threadPost"
-          placeholder="Poster un commentaire ..."
-        />
-
-        <!-- <button raised class="primary" @click="onPickFile">Upload Image</button> -->
-        <input
-          type="file"
-          ref="fileInput"
-          accept="image/*"
-          @change="onFilePicked"
-        />
+        <input type="file" accept="image/*" ref="meuh" @change="onFilePicked" />
         <div class="mt-3">
           <button
             type="submit"
@@ -51,12 +40,12 @@
           >
             Publier
           </button>
-          <!-- <div class="buttonUpload">
-            <input name="transfertFile" type="file" accept="image/*" @change="onFileSelected" />
-          </div> -->
         </div>
       </div>
     </form>
+
+
+
 
     <div class="container">
       <div class="containerLabel">
@@ -76,12 +65,13 @@
       <div :key="threads" v-for="threads in threads">
         <div class="containerThread">
           <div class="cards">
-            <div class="userId">User : {{ threads.email }}</div>
-            <div class="titre">Titre : {{ threads.titre }}</div>
+            <div class="userId">{{ threads.email }}</div>
+            <div class="titre">{{ threads.titre }}</div>
 
-            <div class="content">Image : {{ threads.imageUrl }}</div>
+            <div class="picture">
+              <img :src="threads.image" />
+            </div>
 
-            <div class="content">Text : {{ threads.text }}</div>
             <div class="date">
               Posté le : {{ getFormatedDate(threads.datePost) }}
             </div>
@@ -89,7 +79,11 @@
             <form @submit.prevent="findOne">
               <div class="mt-3">
                 <button type="submit" class="btn btn-primary">Répondre</button>
+                <a href="#profile"><i class="fas fa-user-alt"></i></a>
               </div>
+              <a href="#profile"><i class="fas fa-user-alt"></i></a>
+              <a href="#"><i class="fas fa-globe"></i></a>
+              <a href="#profile"><i class="fas fa-user-alt"></i></a>
             </form>
           </div>
         </div>
@@ -113,7 +107,6 @@ export default {
       threadPost: "",
       titre: "",
       email: localStorage.getItem("user"),
-      //selectedFile: null,
       imageUrl: "",
       image: null,
       selectedFile: null,
@@ -165,38 +158,54 @@ export default {
       this.$refs.fileInput.click();
     },
     onFilePicked(event) {
+      // this.image = event.target.files[0];
+      // console.log(this.image);
+      this.image = this.$refs.meuh; //[0];
+      console.log(this.image.files);
       const files = event.target.files;
       let filename = files[0].name;
       if (filename.lastIndexOf(".") <= 0) {
         return alert("please add a valid file !");
       }
-      const fileReader = new FileReader();
+      const fileReader = new FileReader(); //sans newFilereader l'image ne s'affiche pas
       fileReader.addEventListener("load", () => {
         this.imageUrl = fileReader.result;
       });
       fileReader.readAsDataURL(files[0]);
-      this.image = files[0];
+      // this.image = files[0];
+      console.log(this.image);
     },
 
     postThread() {
+      const formData = new FormData();
+      if (this.image) {
+        console.log("il y a une image");
+        formData.append("image", this.image.files[0]);
+      }
 
+      formData.append("email", this.email);
+      formData.append("titre", this.titre);
 
       instance
-        .post("/threads/", {
-          email: this.email,
-          titre: this.titre,
-          text: this.threadPost,
-          imageUrl: this.text,
-          image: this.image,
-          file: this.text,
+        .post(
+          "/threads/",
+          formData,
+          // {
+          //   email: this.email,
+          //   titre: this.titre,
+          //   text: this.threadPost,
+          //   imageUrl: this.text,
+          //   image: this.image.files[0],
+          //   file: this.text,
+          // },
 
-          headers: {
+          {
             "Content-Type": "multipart/form-data",
-          },
-        })
+          }
+        )
         .then((response) => {
           console.log(response);
-          this.$router.go();
+          //this.$router.go();
           console.log("SUCCESS!!");
         })
         .catch((error) => {
@@ -223,11 +232,13 @@ export default {
     },
 
     //CHANGE-----------------------------------------//
-    findOne(req) {
-      const idthread = req.params.idthread;
+    findOne() {
+      const idthread = this.$route.params.idthread; //on prend l'ID thread
 
+      // instance
+      //   .get(`/${idthread}`,
       instance
-        .get(`/:threadId/${idthread}`, {
+        .get(`${this.$apiUrl}/:threadId/${idthread}`, {
           // .get("/threads/:threadId", {
           email: this.email,
           titre: this.titre,
@@ -235,6 +246,7 @@ export default {
         })
         .then((response) => {
           console.log(response);
+          console.log("on est dans la reponse du thread ID");
           //this.$router.go();
           //this.$router.push("/thread");
         })
@@ -266,6 +278,9 @@ export default {
   float: left;
 }
 
+
+
+
 .menu {
   float: right;
 }
@@ -283,7 +298,7 @@ export default {
 }
 
 .hello {
-  background: darkgray;
+  background: #022c63;
 }
 
 .containerLabel {
@@ -336,6 +351,11 @@ export default {
   border-radius: 5px;
   margin: 4px auto;
   width: 50%;
+}
+
+.picture img {
+  width: 100%;
+  border-radius: 5px;
 }
 
 .subforum-column {

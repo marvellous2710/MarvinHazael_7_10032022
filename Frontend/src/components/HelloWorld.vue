@@ -18,34 +18,43 @@
       id="formulaire"
     >
       <div class="cardThread">
-        <div class="titre">{{ email }}</div>
+        <div class="user">{{ user }}</div>
 
         <input
           type="text"
           class="postThread"
           v-model="titre"
-          placeholder="Poster ..."
+          placeholder="Publier ..." 
         />
 
         <div>
           <img :src="imageUrl" height="150" />
         </div>
 
-        <input type="file" accept="image/*" ref="meuh" @change="onFilePicked" />
-        <div class="mt-3">
+        <div class="btnPublication">
+          <label for="file" class="btn btn-primary"
+            ><i class="fas fa-image"></i
+          ></label>
+          <input
+            id="file"
+            type="file"
+            class="input-file"
+            accept="image/*"
+            ref="meuh"
+            @change="onFilePicked"
+          />
+          <div class="mt-3"></div>
+
           <button
             type="submit"
             class="btn btn-primary"
             :disabled="!titre.length"
           >
-            Publier
+            <i class="fas fa-paper-plane"></i> Publier
           </button>
         </div>
       </div>
     </form>
-
-
-
 
     <div class="container">
       <div class="containerLabel">
@@ -62,28 +71,45 @@
         </div>
       </div>
 
+
       <div :key="threads" v-for="threads in threads">
         <div class="containerThread">
           <div class="cards">
-            <div class="userId">{{ threads.email }}</div>
-            <div class="titre">{{ threads.titre }}</div>
+            <div class="title-container">
+              <div class="title">
+                <p class="userId">{{ threads.email }}</p>
+                <p class="titre">{{ threads.titre }}</p>
+                
+              </div>
+            </div>
 
             <div class="picture">
               <img :src="threads.image" />
             </div>
 
-            <div class="date">
-              Posté le : {{ getFormatedDate(threads.datePost) }}
-            </div>
+            <small class="date">
+              Posté le {{ getFormatedDate(threads.datePost) }}
+            </small>
 
             <form @submit.prevent="findOne">
               <div class="mt-3">
-                <button type="submit" class="btn btn-primary">Répondre</button>
-                <a href="#profile"><i class="fas fa-user-alt"></i></a>
+                <button class="btn btn-primary">
+                  <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i> J'aime
+                </button>
+                <button type="submit" class="btn btn-primary" @click="findOne()">
+                  <i class="fas fa-comment-alt"></i> Répondre
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  v-if="user == threads.email"
+                >
+                  <i class="fas fa-edit" @click="updatePost()"></i> Modifier
+                </button>
+                <button class="btn btn-primary" v-if="user == threads.email">
+                  <i class="fas fa-trash-alt" @click="deletePost()"></i> Supprimer
+                </button>
               </div>
-              <a href="#profile"><i class="fas fa-user-alt"></i></a>
-              <a href="#"><i class="fas fa-globe"></i></a>
-              <a href="#profile"><i class="fas fa-user-alt"></i></a>
             </form>
           </div>
         </div>
@@ -106,11 +132,15 @@ export default {
       threads: "",
       threadPost: "",
       titre: "",
-      email: localStorage.getItem("user"),
+      //email: "",
+      user: localStorage.getItem("user"),
+     
+      //email: localStorage.getItem("user"),
       imageUrl: "",
       image: null,
       selectedFile: null,
       file: "",
+     
     };
   },
 
@@ -149,17 +179,8 @@ export default {
   },
 
   methods: {
-    handleFileUpload() {
-      this.file = this.$refs.file.files[0];
-      console.log(this.file);
-    },
 
-    onPickFile() {
-      this.$refs.fileInput.click();
-    },
     onFilePicked(event) {
-      // this.image = event.target.files[0];
-      // console.log(this.image);
       this.image = this.$refs.meuh; //[0];
       console.log(this.image.files);
       const files = event.target.files;
@@ -172,18 +193,22 @@ export default {
         this.imageUrl = fileReader.result;
       });
       fileReader.readAsDataURL(files[0]);
-      // this.image = files[0];
       console.log(this.image);
+    },
+
+    disconnect() {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
+      this.$router.push("/login");
     },
 
     postThread() {
       const formData = new FormData();
       if (this.image) {
-        console.log("il y a une image");
         formData.append("image", this.image.files[0]);
       }
 
-      formData.append("email", this.email);
+      formData.append("email", this.user);
       formData.append("titre", this.titre);
 
       instance
@@ -225,35 +250,29 @@ export default {
 
       console.log(this.selectedFile);
     },
+    
     disconnect() {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
 
-    //CHANGE-----------------------------------------//
-    findOne() {
-      const idthread = this.$route.params.idthread; //on prend l'ID thread
-
-      // instance
-      //   .get(`/${idthread}`,
-      instance
-        .get(`${this.$apiUrl}/:threadId/${idthread}`, {
-          // .get("/threads/:threadId", {
-          email: this.email,
-          titre: this.titre,
-          text: this.threadPost,
-        })
-        .then((response) => {
-          console.log(response);
-          console.log("on est dans la reponse du thread ID");
-          //this.$router.go();
-          //this.$router.push("/thread");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
+    // likeDislikePost() {
+    // instance
+    //     .post(
+    //       "/like/"
+      
+    //     )
+    //     .then((response) => {
+    //       console.log(response);
+    //       //this.$router.go();
+    //       console.log("SUCCESS!!");
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //       console.log("FAILURE!!");
+    //     });
+    // },
   },
 
   props: {
@@ -277,9 +296,6 @@ export default {
   letter-spacing: 1px;
   float: left;
 }
-
-
-
 
 .menu {
   float: right;
@@ -318,6 +334,14 @@ export default {
   color: #022c63;
 }
 
+.input-file {
+  display: none;
+}
+
+.btnPublication {
+  display: flex;
+}
+
 .lapizzadelamamma a {
   text-decoration: none;
 }
@@ -344,18 +368,40 @@ export default {
 }
 
 /* ---------------------- CARDS ------------------------------*/
+
 .cards {
   background-color: whitesmoke;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
-  padding: 5px;
+  padding: 10px;
   border-radius: 5px;
   margin: 4px auto;
   width: 50%;
 }
 
+.title {
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+}
+
+
 .picture img {
   width: 100%;
   border-radius: 5px;
+}
+
+.date {
+  display: flex;
+  text-align: start;
+  padding: 5px;
+}
+
+.mt-3 {
+  margin: 5px;
+}
+
+.mt-3 button {
+  margin: 5px;
 }
 
 .subforum-column {

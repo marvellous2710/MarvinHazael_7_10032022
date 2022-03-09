@@ -11,4 +11,3 @@ import axios               from 'axios';
 library.add(fas);
 
 createApp(App).component('fa', FontAwesomeIcon).use(store).use(router).mount('#app');
-

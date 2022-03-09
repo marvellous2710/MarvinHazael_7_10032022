@@ -19,6 +19,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/users', router);
 app.use('/threads', thread);
+//app.use('/like', thread);
 app.use('/category', categories);
 
 app.listen(PORT,() => console.log('Server running on port ' + PORT));

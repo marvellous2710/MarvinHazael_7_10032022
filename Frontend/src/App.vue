@@ -6,6 +6,7 @@
       <router-link to="/login">Se connecter</router-link> |
       <router-link to="/signup">S'inscrire</router-link> |
       <router-link to="/thread">THREAD</router-link>
+      
       <router-view /> 
     </div>
 

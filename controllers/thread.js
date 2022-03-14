@@ -35,12 +35,14 @@ exports.createThread = (req, res, next) => {
 };
 
 
+
 exports.getAllThread = (req, res, next) => {
   const size = req.query.size;
   const pageNumber = req.query.page;
   const offset = (pageNumber - 1) * size;
 
   const mysql = `SELECT * FROM thread ORDER BY datePost DESC LIMIT ${size} OFFSET ${offset}`; //DESC pour afficher les thread par le dernier posté
+  //const mysql = `SELECT * FROM thread `; 
 
   db.query(mysql, (err, result) => {
     if (err) {

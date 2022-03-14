@@ -72,41 +72,42 @@
       </div>
 
 
-      <div :key="threads" v-for="threads in threads">
+      <div :key="thread" v-for="thread in threads">
         <div class="containerThread">
           <div class="cards">
             <div class="title-container">
               <div class="title">
-                <p class="userId">{{ threads.email }}</p>
-                <p class="titre">{{ threads.titre }}</p>
+                <p class="userId">{{ thread.email }}</p>
+                <p class="titre">{{ thread.titre }}</p>
+                <p class="titre">{{ thread.idthread }}</p>
                 
               </div>
             </div>
 
             <div class="picture">
-              <img :src="threads.image" />
+              <img :src="thread.image" />
             </div>
 
             <small class="date">
-              Posté le {{ getFormatedDate(threads.datePost) }}
+              Posté le {{ getFormatedDate(thread.datePost) }}
             </small>
 
-            <form @submit.prevent="findOne">
+            <form @submit.prevent="">
               <div class="mt-3">
                 <button class="btn btn-primary">
-                  <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i> J'aime
+                  <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i> {{ currentValue }}
                 </button>
-                <button type="submit" class="btn btn-primary" @click="findOne()">
+                <button type="submit" class="btn btn-primary" @click="findOne( thread.idthread )">
                   <i class="fas fa-comment-alt"></i> Répondre
                 </button>
                 <button
-                  type="submit"
+                  type="submit" 
                   class="btn btn-primary"
-                  v-if="user == threads.email"
+                  v-if="user == thread.email"
                 >
                   <i class="fas fa-edit" @click="updatePost()"></i> Modifier
                 </button>
-                <button class="btn btn-primary" v-if="user == threads.email">
+                <button class="btn btn-primary" v-if="user == thread.email">
                   <i class="fas fa-trash-alt" @click="deletePost()"></i> Supprimer
                 </button>
               </div>
@@ -133,22 +134,25 @@ export default {
       threadPost: "",
       titre: "",
       //email: "",
-      user: localStorage.getItem("user"),
-     
+      user: localStorage.getItem("user"),    
       //email: localStorage.getItem("user"),
       imageUrl: "",
       image: null,
       selectedFile: null,
       file: "",
+       //idthread: this.$route.params.idthread,
+      currentValue: 0,
      
     };
   },
+
+  
 
   created() {
     this.page = 1;
 
     instance
-      .get("/threads/?page=1&size=5")
+      .get("/threads/?page=1&size=5")   
       .then((reponse) => {
         this.threads = reponse.data;
         console.log(this.threads);
@@ -157,13 +161,14 @@ export default {
         console.log(error.response.status);
       });
 
-    document.addEventListener.call(window, "scroll", (event) => {
+    document.addEventListener.call(window, "scroll", (event) => {    
       const scrollValue =
         (window.innerHeight + window.scrollY) / document.body.offsetHeight;
 
-      if (scrollValue == 1) {
+      if (scrollValue == 1) {       
         this.threads;
-        ++this.page;
+        this.page = this.page + 1;
+        //++this.page;
         console.log(this.page);
 
         instance.get(`/threads/?page=${this.page}&size=5`).then((reponse) => {
@@ -173,12 +178,32 @@ export default {
       }
     });
 
+  
+   
+
     instance.get("/category").then((reponse) => {
       this.categories = reponse.data;
     });
+
+
+    // instance.get("/like").then((reponse) => {
+    //   this.like = reponse.data;
+    // });
   },
 
   methods: {
+     findOne(idthread){
+        instance.get(`/threads/${idthread}`) 
+        .then((reponse) => {
+        this.threads = reponse.data;
+        this.$router.push("/thread");
+        
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("FAILURE!!");
+        });
+    },
 
     onFilePicked(event) {
       this.image = this.$refs.meuh; //[0];
@@ -256,6 +281,9 @@ export default {
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
+    likeDislikePost() {
+      this.currentValue =  this.currentValue + 1;
+    }
 
     // likeDislikePost() {
     // instance
@@ -278,6 +306,7 @@ export default {
   props: {
     msg: String,
   },
+
 };
 </script>
 

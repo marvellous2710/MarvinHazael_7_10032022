@@ -11,5 +11,7 @@ router.put("/", userCtrl.modifyUser);
 router.delete("/:id", userCtrl.deleteUser);
 router.get("/alluser", userCtrl.allUser);
 
+//router.put("/upPassword", userCtrl.modifyPassword);
+
 
 module.exports = router;

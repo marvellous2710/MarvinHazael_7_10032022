@@ -5,7 +5,6 @@ const thread     = require("./routes/thread");
 const categories = require("./routes/category");
 const path       = require('path');
 
-
 //const like = require("./routes/like");
 
 const PORT = process.env.PORT || 4000;

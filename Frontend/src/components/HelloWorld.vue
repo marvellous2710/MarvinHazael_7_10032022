@@ -4,9 +4,12 @@
       <div class="container">
         <a href="#home" class="logo">Groupomania</a>
         <nav class="menu">
-          <a href="#"><i class="fas fa-globe"></i></a>
+          <a href="#category" class="categoryBurger"
+            ><i class="fas fa-utensils"></i
+          ></a>
+          <a href="/"><i class="fas fa-globe"></i></a>
           <a href="#profile"><i class="fas fa-user-alt"></i></a>
-          <a href="#notification"><i class="fas fa-bell"></i></a>
+
           <a @click.prevent="disconnect"><i class="fas fa-sign-out-alt"></i></a>
         </nav>
       </div>
@@ -24,7 +27,7 @@
           type="text"
           class="postThread"
           v-model="titre"
-          placeholder="Publier ..." 
+          placeholder="Publier ..."
         />
 
         <div>
@@ -56,7 +59,7 @@
       </div>
     </form>
 
-    <div class="container">
+    <div class="containerLabelThread">
       <div class="containerLabel">
         <div
           class="lapizzadelamamma"
@@ -71,47 +74,56 @@
         </div>
       </div>
 
-
-      <div :key="thread" v-for="thread in threads">
-        <div class="containerThread">
-          <div class="cards">
-            <div class="title-container">
-              <div class="title">
-                <p class="userId">{{ thread.email }}</p>
-                <p class="titre">{{ thread.titre }}</p>
-                <p class="titre">{{ thread.idthread }}</p>
-                
+      <div class="container">
+        <div :key="thread" v-for="thread in threads">
+          <div class="containerThread">
+            <div class="cards">
+              <div class="title-container">
+                <div class="title">
+                  <p class="userId">{{ thread.email }}</p>
+                  <p class="titre">{{ thread.titre }}</p>
+                  <p class="titre">{{ thread.idthread }}</p>
+                </div>
               </div>
-            </div>
 
-            <div class="picture">
-              <img :src="thread.image" />
-            </div>
-
-            <small class="date">
-              Posté le {{ getFormatedDate(thread.datePost) }}
-            </small>
-
-            <form @submit.prevent="">
-              <div class="mt-3">
-                <button class="btn btn-primary">
-                  <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i> {{ currentValue }}
-                </button>
-                <button type="submit" class="btn btn-primary" @click="findOne( thread.idthread )">
-                  <i class="fas fa-comment-alt"></i> Répondre
-                </button>
-                <button
-                  type="submit" 
-                  class="btn btn-primary"
-                  v-if="user == thread.email"
-                >
-                  <i class="fas fa-edit" @click="updatePost()"></i> Modifier
-                </button>
-                <button class="btn btn-primary" v-if="user == thread.email">
-                  <i class="fas fa-trash-alt" @click="deletePost()"></i> Supprimer
-                </button>
+              <div class="picture">
+                <img :src="thread.image" />
               </div>
-            </form>
+
+              <small class="date">
+                Posté le {{ getFormatedDate(thread.datePost) }}
+              </small>
+
+              <form @submit.prevent="">
+                <div class="mt-3">
+                  <button class="btn btn-primary" @click="likeDislikePost()">
+                    <i class="fas fa-thumbs-up"></i> {{ currentValue }}
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    @click="findOne(thread.idthread)"
+                  >
+                    <i class="fas fa-comment-alt"></i> Répondre
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    v-if="user == thread.email"
+                    @click="updatePost()"
+                  >
+                    <i class="fas fa-edit"></i> Modifier
+                  </button>
+                  <button
+                    class="btn btn-primary"
+                    v-if="user == thread.email"
+                    @click="deletePost(thread.idthread)"
+                  >
+                    <i class="fas fa-trash-alt"></i> Supprimer
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -134,25 +146,22 @@ export default {
       threadPost: "",
       titre: "",
       //email: "",
-      user: localStorage.getItem("user"),    
+      user: localStorage.getItem("user"),
       //email: localStorage.getItem("user"),
       imageUrl: "",
       image: null,
       selectedFile: null,
       file: "",
-       //idthread: this.$route.params.idthread,
+      //idthread: this.$route.params.idthread,
       currentValue: 0,
-     
     };
   },
-
-  
 
   created() {
     this.page = 1;
 
     instance
-      .get("/threads/?page=1&size=5")   
+      .get("/threads/?page=1&size=5")
       .then((reponse) => {
         this.threads = reponse.data;
         console.log(this.threads);
@@ -161,14 +170,14 @@ export default {
         console.log(error.response.status);
       });
 
-    document.addEventListener.call(window, "scroll", (event) => {    
+    document.addEventListener.call(window, "scroll", (event) => {
       const scrollValue =
         (window.innerHeight + window.scrollY) / document.body.offsetHeight;
 
-      if (scrollValue == 1) {       
+      if (scrollValue == 1) {
         this.threads;
-        this.page = this.page + 1;
-        //++this.page;
+        //this.page = this.page + 1;
+        ++this.page;
         console.log(this.page);
 
         instance.get(`/threads/?page=${this.page}&size=5`).then((reponse) => {
@@ -178,13 +187,9 @@ export default {
       }
     });
 
-  
-   
-
     instance.get("/category").then((reponse) => {
       this.categories = reponse.data;
     });
-
 
     // instance.get("/like").then((reponse) => {
     //   this.like = reponse.data;
@@ -192,16 +197,81 @@ export default {
   },
 
   methods: {
-     findOne(idthread){
-        instance.get(`/threads/${idthread}`) 
+    findOne(idthread) {
+      instance
+        .get(`/threads/${idthread}`)
         .then((reponse) => {
-        this.threads = reponse.data;
-        this.$router.push("/thread");
-        
+          this.threads = reponse.data;
+          this.$router.push("/thread");
         })
         .catch((error) => {
           console.log(error);
           console.log("FAILURE!!");
+        });
+    },
+
+    deletePost(idthread) {
+      // function checker() {
+      //   const result = confirm("Are you sure ?");
+      //   if (result == false) {
+      //     Event.preventDefault();
+      //     //location.reload();
+      //   }
+      // }
+
+          // instance
+          // .delete(`/threads/${idthread}`)
+          // .then((reponse) => {
+          //   this.threads = reponse.data;
+          //   this.$router.go();
+          //   console.log("Thread supprimé !");
+          // })
+          // .catch((error) => {
+          //   console.log(error);
+          //   console.log("FAILURE !!!");
+          // });
+
+      
+
+
+
+      // if (checker()) {
+      //   instance
+      //     .delete(`/threads/${idthread}`)
+      //     .then((reponse) => {
+      //       this.threads = reponse.data;
+      //       this.$router.go();
+      //       console.log("Thread supprimé !");
+      //     })
+      //     .catch((error) => {
+      //       console.log(error);
+      //       console.log("FAILURE !!!");
+      //     });
+      // }
+      instance
+        .delete(`/threads/${idthread}`)
+        .then((reponse) => {
+          this.threads = reponse.data;
+          this.$router.go();
+          console.log("Thread supprimé !");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("FAILURE !!!");
+        });
+    },
+    updatePost(idthread) {
+      instance
+        .put(`/threads/${idthread}`)
+        .then((reponse) => {
+          this.threads = reponse.data;
+          //this.$router.go();
+
+          console.log("Thread modifié !");
+        })
+        .catch((error) => {
+          console.log(error); 
+          console.log("UPDATE FAILURE !!!");
         });
     },
 
@@ -237,25 +307,12 @@ export default {
       formData.append("titre", this.titre);
 
       instance
-        .post(
-          "/threads/",
-          formData,
-          // {
-          //   email: this.email,
-          //   titre: this.titre,
-          //   text: this.threadPost,
-          //   imageUrl: this.text,
-          //   image: this.image.files[0],
-          //   file: this.text,
-          // },
-
-          {
-            "Content-Type": "multipart/form-data",
-          }
-        )
+        .post("/threads/", formData, {
+          "Content-Type": "multipart/form-data",
+        })
         .then((response) => {
           console.log(response);
-          //this.$router.go();
+          this.$router.go();
           console.log("SUCCESS!!");
         })
         .catch((error) => {
@@ -264,7 +321,7 @@ export default {
         });
     },
     getFormatedDate(date) {
-      return moment(String(date)).format("DD/MM/YYYY hh:mm");
+      return moment(String(date)).format("DD-MM-YYYY hh:mm");
     },
     onFileSelected(event) {
       this.selectedFile = event.target.files[0];
@@ -275,21 +332,21 @@ export default {
 
       console.log(this.selectedFile);
     },
-    
+
     disconnect() {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
     likeDislikePost() {
-      this.currentValue =  this.currentValue + 1;
-    }
+      this.currentValue = this.currentValue + 1;
+    },
 
     // likeDislikePost() {
     // instance
     //     .post(
     //       "/like/"
-      
+
     //     )
     //     .then((response) => {
     //       console.log(response);
@@ -306,7 +363,6 @@ export default {
   props: {
     msg: String,
   },
-
 };
 </script>
 
@@ -330,6 +386,10 @@ export default {
   float: right;
 }
 
+.categoryBurger {
+  visibility: hidden;
+}
+
 .menu a:hover {
   color: red;
   border: solid 1px violet;
@@ -346,16 +406,26 @@ export default {
   background: #022c63;
 }
 
-.containerLabel {
+.containerLabelThread {
   display: flex;
+  margin-left: 15%;
+}
+
+.containerLabel {
+  /* display: flex; */
   border-radius: 5px;
   margin: 4px auto;
-  width: 40%;
+  margin-right: 5px;
+  width: 10%;
+  /* background-color: red; */
+  text-align: start;
+  font-size: 2rem;
 }
 
 .label {
-  background-color: #022c63;
+  /* background-color: whitesmoke; */
   margin-right: 10px;
+  color: whitesmoke;
 }
 
 .label:hover {
@@ -381,7 +451,7 @@ export default {
   padding: 5px;
   border-radius: 5px;
   margin: 4px auto;
-  width: 40%;
+  width: 50%;
   display: flex;
 }
 
@@ -403,8 +473,10 @@ export default {
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
   padding: 10px;
   border-radius: 5px;
-  margin: 4px auto;
-  width: 50%;
+  /* margin: 4px auto; */
+  /* margin: 50px 0px 0px 245px; */
+  width: 68%;
+  margin-bottom: 20px;
 }
 
 .title {
@@ -412,7 +484,6 @@ export default {
   flex-direction: column;
   text-align: start;
 }
-
 
 .picture img {
   width: 100%;
@@ -437,4 +508,26 @@ export default {
   border-radius: 5px;
   background-color: cadetblue;
 }
+
+/*----------------------------------- RESPONSIVE -----------------------------------*/
+
+@media all and (max-width: 800px) {
+  .containerLabelThread {
+    display: inline;
+  }
+
+  .cards {
+    width: auto;
+  }
+
+  .cardThread {
+    width: 90%;
+  }
+
+  .categoryBurger {
+    visibility: visible;
+  }
+}
+
+/*-----------------------------------FIN RESPONSIVE -----------------------------------*/
 </style>

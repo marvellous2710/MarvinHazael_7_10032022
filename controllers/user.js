@@ -36,8 +36,6 @@ exports.login = (req, res, next) => {
               });
             }
             if (bResult) {
-        
-
                 const token = jwt.sign({
                     email: result[0].username,
                     idtableUser: result[0].idtableUser,
@@ -151,3 +149,71 @@ exports.allUser = (req, res, next) => {
 }
 
 exports.oneUser= (req, res, next) => {}
+
+
+
+
+exports.modifyPassword = (req, res, next) => {
+  const mysql = "UPDATE tableUser SET password = ? WHERE idtabluser = ?";
+  const password = req.body.password;
+  const threadId = req.params.threadId;
+  
+  db.query(mysql, [password, threadId],(err, result) => {
+
+    if (err) {
+      throw err;
+      return res.status(400).send({
+        message: err,
+      });
+    }
+      return res.status(201).send({
+        message: "Thread modified !",
+      });
+  });
+  bcrypt.hash(req.body.password, 10, (err, hash) => {
+    if (err) {
+      return res.status(500).send({
+        message: err,
+      });
+    } else {    
+      const motDpass = ({ password: hash });
+      
+
+      db.query(
+          mysql,
+          motDpass,
+        (err, result) => {
+          if (err) {
+            throw err;
+            return res.status(400).send({
+              message: err,
+            });
+          }
+          return res.status(201).send({
+            message: "Password Updated !",
+          });
+        }
+      );
+    }
+  });
+};
+
+
+// exports.modifyPassword = (req, res, next) => {
+//   const mysql = "UPDATE tableUser SET password = ? WHERE idthread = ?";
+//   const password = req.body.password;
+//   const threadId = req.params.threadId;
+  
+//   db.query(mysql, [password, threadId],(err, result) => {
+
+//   if (err) {
+//     throw err;
+//     return res.status(400).send({
+//       message: err,
+//     });
+//   }
+//     return res.status(201).send({
+//       message: "Password modified HOLY SHIT !",
+//     });
+//   });
+// };

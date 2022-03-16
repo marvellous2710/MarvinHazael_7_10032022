@@ -3,38 +3,36 @@ const jwt = require("jsonwebtoken");
 const db = require("../lib/db");
 
 exports.createThread = (req, res, next) => {
-
   const mysql = `INSERT INTO thread SET ?`;
-  
+
   //condition ternaire comme if else
-  const thread = (req.file) ? {
-    titre: req.body.titre,
-    text : req.body.text,
-    email: req.body.email,  
-    image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  } : {
-    titre: req.body.titre,
-    text : req.body.text,
-    email: req.body.email,
-  };
-
-  
-    db.query(mysql, thread,
-      (err, result) => {
-        if (err) {
-          throw err;
-          return res.status(400).send({
-            message: err,
-          });
-        }
-        return res.status(201).send({
-          message: "Thread registred !",
-        });
+  const thread = req.file
+    ? {
+        titre: req.body.titre,
+        text: req.body.text,
+        email: req.body.email,
+        image: `${req.protocol}://${req.get("host")}/images/${
+          req.file.filename
+        }`,
       }
-    );
+    : {
+        titre: req.body.titre,
+        text: req.body.text,
+        email: req.body.email,
+      };
+
+  db.query(mysql, thread, (err, result) => {
+    if (err) {
+      throw err;
+      return res.status(400).send({
+        message: err,
+      });
+    }
+    return res.status(201).send({
+      message: "Thread registred !",
+    });
+  });
 };
-
-
 
 exports.getAllThread = (req, res, next) => {
   const size = req.query.size;
@@ -42,7 +40,7 @@ exports.getAllThread = (req, res, next) => {
   const offset = (pageNumber - 1) * size;
 
   const mysql = `SELECT * FROM thread ORDER BY datePost DESC LIMIT ${size} OFFSET ${offset}`; //DESC pour afficher les thread par le dernier posté
-  //const mysql = `SELECT * FROM thread `; 
+  //const mysql = `SELECT * FROM thread `;
 
   db.query(mysql, (err, result) => {
     if (err) {
@@ -76,20 +74,18 @@ exports.getOneThread = (req, res, next) => {
   });
 };
 
-
 exports.modifyThread = (req, res, next) => {
   const mysql    = "UPDATE thread SET titre = ? WHERE idthread = ?";
   const titre    = req.body.titre;
   const threadId = req.params.threadId;
-  
-  db.query(mysql, [titre, threadId],(err, result) => {
 
-  if (err) {
-    throw err;
-    return res.status(400).send({
-      message: err,
-    });
-  }
+  db.query(mysql, [titre, threadId], (err, result) => {
+    if (err) {
+      throw err;
+      return res.status(400).send({
+        message: err,
+      });
+    }
     return res.status(201).send({
       message: "Thread modified !",
     });
@@ -97,42 +93,11 @@ exports.modifyThread = (req, res, next) => {
 };
 
 
-exports.modifyPassword = (req, res, next) => {
-  const mysql = "UPDATE tableuser SET password = ? WHERE idtableuser = ?";
-  // const password = req.body.password;
-  const threadId = req.params.threadId;
-
- bcrypt.hash(req.body.password, 10, (err, hash) => {
-   if (err) {
-     return res.status(500).send({
-       message: err,
-     });
-   }
- })
-
- const password =  ({ password: hash }) ;
-    
-  
-  db.query(mysql, [password, threadId],(err, result) => {
-
-  if (err) {
-    throw err;
-    return res.status(400).send({
-      message: err,
-    });
-  }
-    return res.status(201).send({
-      message: "Password modified HOLY SHIT !",
-    });
-  });
-};
-
-
 exports.deleteThread = (req, res, next) => {
-  const mysql = "DELETE FROM thread WHERE idthread = ?";
+  const mysql    = "DELETE FROM thread WHERE idthread = ?";
   const threadId = req.params.threadId;
 
-    db.query(mysql, [threadId], (err, result) => {
+  db.query(mysql, [threadId], (err, result) => {
     if (err) {
       throw err;
       return res.status(400).send({
@@ -144,10 +109,5 @@ exports.deleteThread = (req, res, next) => {
     });
   });
 };
-
-
-
-
-
 
 exports.likeDislike = (req, res, next) => {};

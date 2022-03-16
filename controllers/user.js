@@ -152,68 +152,28 @@ exports.oneUser= (req, res, next) => {}
 
 
 
-
 exports.modifyPassword = (req, res, next) => {
-  const mysql = "UPDATE tableUser SET password = ? WHERE idtabluser = ?";
-  const password = req.body.password;
-  const threadId = req.params.threadId;
-  
-  db.query(mysql, [password, threadId],(err, result) => {
+  const mysql      = "UPDATE tableuser SET password = ? WHERE idtableuser = ?";
+  const threadId   = req.params.threadId;
 
-    if (err) {
-      throw err;
-      return res.status(400).send({
-        message: err,
-      });
-    }
-      return res.status(201).send({
-        message: "Thread modified !",
-      });
-  });
   bcrypt.hash(req.body.password, 10, (err, hash) => {
     if (err) {
       return res.status(500).send({
         message: err,
       });
-    } else {    
-      const motDpass = ({ password: hash });
-      
+    } else {
 
-      db.query(
-          mysql,
-          motDpass,
-        (err, result) => {
-          if (err) {
-            throw err;
-            return res.status(400).send({
-              message: err,
-            });
-          }
-          return res.status(201).send({
-            message: "Password Updated !",
+      db.query(mysql, [ hash, threadId ], (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(400).send({
+            message: err,
           });
         }
-      );
-    }
+        return res.status(201).send({
+          message: "Password updated !",
+        });
+      });
+    } 
   });
 };
-
-
-// exports.modifyPassword = (req, res, next) => {
-//   const mysql = "UPDATE tableUser SET password = ? WHERE idthread = ?";
-//   const password = req.body.password;
-//   const threadId = req.params.threadId;
-  
-//   db.query(mysql, [password, threadId],(err, result) => {
-
-//   if (err) {
-//     throw err;
-//     return res.status(400).send({
-//       message: err,
-//     });
-//   }
-//     return res.status(201).send({
-//       message: "Password modified HOLY SHIT !",
-//     });
-//   });
-// };

@@ -11,8 +11,7 @@ router.get("/", auth, threadCtrl.getAllThread);
 
 router.get("/:threadId",auth,  threadCtrl.getOneThread);
 
-//router.put("/:threadId", threadCtrl.modifyThread);
-router.put("/:threadId", threadCtrl.modifyPassword);
+router.put("/:threadId", threadCtrl.modifyThread);
 
 router.delete("/:threadId", threadCtrl.deleteThread);
 

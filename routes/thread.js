@@ -15,7 +15,7 @@ router.put("/:threadId", threadCtrl.modifyThread);
 
 router.delete("/:threadId", threadCtrl.deleteThread);
 
-router.post("/:id/like", auth, threadCtrl.likeDislike);
+router.post("/:threadId", auth, threadCtrl.likeDislike);
 
 
 

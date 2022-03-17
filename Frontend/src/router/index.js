@@ -29,6 +29,11 @@ const routes = [
     path: '/thread',
     name: 'Thread',
     component: () => import(/* webpackChunkName: "login" */ '../views/Thread.vue')
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import(/* webpackChunkName: "login" */ '../views/Profile.vue')
   }
   
 ]

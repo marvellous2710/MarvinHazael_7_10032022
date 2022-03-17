@@ -5,7 +5,9 @@
       <router-link to="/about">About</router-link> |
       <router-link to="/login">Se connecter</router-link> |
       <router-link to="/signup">S'inscrire</router-link> |
-      <router-link to="/thread">THREAD</router-link>
+      <router-link to="/thread">THREAD</router-link> |
+      |
+      <router-link to="/profile">Profile</router-link>
       
       <router-view /> 
     </div>

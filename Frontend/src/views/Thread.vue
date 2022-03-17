@@ -12,6 +12,7 @@
               </div>
             </div>
           
+          
 
             <div class="picture">
               <img :src="thread.image" />
@@ -86,4 +87,167 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.header {
+  background-color: #022c63;
+  height: 70px;
+  line-height: 70px;
+}
+
+.logo {
+  color: whitesmoke;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  float: left;
+}
+
+.menu {
+  float: right;
+}
+
+.categoryBurger {
+  visibility: hidden;
+}
+
+.menu a:hover {
+  color: red;
+  border: solid 1px violet;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.menu a {
+  color: whitesmoke;
+  margin-right: 20px;
+}
+
+.hello {
+  background: #022c63;
+}
+
+.containerLabelThread {
+  display: flex;
+  margin-left: 15%;
+}
+
+.containerLabel {
+  /* display: flex; */
+  border-radius: 5px;
+  margin: 4px auto;
+  margin-right: 5px;
+  width: 10%;
+  /* background-color: red; */
+  text-align: start;
+  font-size: 2rem;
+}
+
+.label {
+  /* background-color: whitesmoke; */
+  margin-right: 10px;
+  color: whitesmoke;
+}
+
+.label:hover {
+  background-color: whitesmoke;
+  color: #022c63;
+}
+
+.input-file {
+  display: none;
+}
+
+.btnPublication {
+  display: flex;
+}
+
+.lapizzadelamamma a {
+  text-decoration: none;
+}
+
+.cardThread {
+  background-color: whitesmoke;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
+  padding: 5px;
+  border-radius: 5px;
+  margin: 4px auto;
+  width: 50%;
+  display: flex;
+}
+
+.cardThread input {
+  border: none;
+}
+
+.postThread {
+  padding: 5px;
+  border-radius: 50px;
+  margin: 4px auto;
+  width: 40%;
+}
+
+/* ---------------------- CARDS ------------------------------*/
+
+.cards {
+  background-color: whitesmoke;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
+  padding: 10px;
+  border-radius: 5px;
+  /* margin: 4px auto; */
+  /* margin: 50px 0px 0px 245px; */
+  width: 68%;
+  margin-bottom: 20px;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+}
+
+.picture img {
+  width: 100%;
+  border-radius: 5px;
+}
+
+.date {
+  display: flex;
+  text-align: start;
+  padding: 5px;
+}
+
+.mt-3 {
+  margin: 5px;
+}
+
+.mt-3 button {
+  margin: 5px;
+}
+
+.subforum-column {
+  border-radius: 5px;
+  background-color: cadetblue;
+}
+
+/*----------------------------------- RESPONSIVE -----------------------------------*/
+
+@media all and (max-width: 800px) {
+  .containerLabelThread {
+    display: inline;
+  }
+
+  .cards {
+    width: auto;
+  }
+
+  .cardThread {
+    width: 90%;
+  }
+
+  .categoryBurger {
+    visibility: visible;
+  }
+}
+
+/*-----------------------------------FIN RESPONSIVE -----------------------------------*/
+</style>

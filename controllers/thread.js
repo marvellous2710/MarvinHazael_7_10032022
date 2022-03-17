@@ -110,4 +110,45 @@ exports.deleteThread = (req, res, next) => {
   });
 };
 
-exports.likeDislike = (req, res, next) => {};
+
+
+//controler si il y déja iduser dans la BDD, si oui supprimer le like sinon insérer 
+exports.likeDislike = (req, res, next) => {
+  const user = { idUser: req.body.like };
+  const mysql = `SELECT like FROM like WHERE LOWER(idUser) = LOWER ?`;
+  //on compare si l'utilisateur existe avant de l'enregistrer
+  db.query(mysql, user, (err, result) => {
+    if (result && result.length) {
+      const mysql = "DELETE FROM like WHERE idthread = ?";
+      const threadId = req.params.threadId;
+
+      db.query(mysql, [threadId], (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(400).send({
+            message: err,
+          });
+        }
+        return res.status(201).send({
+          message: "like deleted !",
+        });
+      });
+    } else {
+      const user = { idUser: req.body.like, idThread: req.body.idthread };
+      const mysql = `INSERT INTO like SET ?`;
+
+      db.query(mysql, user, (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(400).send({
+            message: err,
+          });
+        }
+        return res.status(201).send({
+          message: "Like !",
+        });
+      });
+    }
+  });
+};
+

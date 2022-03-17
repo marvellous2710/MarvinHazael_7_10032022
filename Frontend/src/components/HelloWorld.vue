@@ -8,8 +8,7 @@
             ><i class="fas fa-utensils"></i
           ></a>
           <a href="/"><i class="fas fa-globe"></i></a>
-          <a href="#profile"><i class="fas fa-user-alt"></i></a>
-
+          <a href="/profile"><i class="fas fa-user-alt"></i></a>
           <a @click.prevent="disconnect"><i class="fas fa-sign-out-alt"></i></a>
         </nav>
       </div>
@@ -23,41 +22,89 @@
       <div class="cardThread">
         <div class="user">{{ user }}</div>
 
-        <input
-          type="text"
-          class="postThread"
-          v-model="titre"
-          placeholder="Publier ..."
-        />
+        <!-- Button trigger modal -->
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+        >
+          Publier un commentaire ...
+        </button>
 
-        <div>
-          <img :src="imageUrl" height="150" />
-        </div>
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  Créer une publication
+                </h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="sendImage">
+                <input
+                  type="text"
+                  class="postThread"
+                  v-model="titre"
+                  placeholder="Publier ..."
+                />
+                <label for="file" class="btn btn-primary"
+                  ><i class="fas fa-image"></i
+                ></label>
+              </div>
 
-        <div class="btnPublication">
-          <label for="file" class="btn btn-primary"
-            ><i class="fas fa-image"></i
-          ></label>
-          <input
-            id="file"
-            type="file"
-            class="input-file"
-            accept="image/*"
-            ref="meuh"
-            @change="onFilePicked"
-          />
-          <div class="mt-3"></div>
-
-          <button
-            type="submit"
-            class="btn btn-primary"
-            :disabled="!titre.length"
-          >
-            <i class="fas fa-paper-plane"></i> Publier
-          </button>
+              <div class="btnPublication">
+                <input
+                  id="file"
+                  type="file"
+                  class="input-file"
+                  accept="image/*"
+                  ref="meuh"
+                  @change="onFilePicked"
+                />
+                <div class="mt-3"></div>
+              </div>
+              <div class="modal-body">
+                <img :src="imageUrl" height="150" />
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  :disabled="!titre.length"
+                >
+                  <i class="fas fa-paper-plane"></i> Publier
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </form>
+
+    <p class="publication" 
+    data-bs-toggle="modal"
+    data-bs-target="#exampleModal"
+    >Publier un commentaire ...</p>
 
     <div class="containerLabelThread">
       <div class="containerLabel">
@@ -106,6 +153,7 @@
                   >
                     <i class="fas fa-comment-alt"></i> Répondre
                   </button>
+
                   <button
                     type="submit"
                     class="btn btn-primary"
@@ -114,13 +162,61 @@
                   >
                     <i class="fas fa-edit"></i> Modifier
                   </button>
+
+                  <!-- Button trigger modal -->
                   <button
+                    type="button"
                     class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#enerveModal"
                     v-if="user == thread.email"
-                    @click="deletePost(thread.idthread)"
                   >
                     <i class="fas fa-trash-alt"></i> Supprimer
                   </button>
+
+                  <!-- Modal -->
+                  <div
+                    class="modal fade"
+                    id="enerveModal"
+                    tabindex="-1"
+                    aria-labelledby="enerveModalLabel"
+                    aria-hidden="true"
+                  >
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="enerveModalLabel">
+                            Modal title
+                          </h5>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                          ></button>
+                        </div>
+                        <div class="modal-body">
+                          Voulez-vous vraiment supprimer ce commentaire ?
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Annuler
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-danger"
+                            @click="deletePost(thread.idthread)"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </form>
             </div>
@@ -211,43 +307,6 @@ export default {
     },
 
     deletePost(idthread) {
-      // function checker() {
-      //   const result = confirm("Are you sure ?");
-      //   if (result == false) {
-      //     Event.preventDefault();
-      //     //location.reload();
-      //   }
-      // }
-
-          // instance
-          // .delete(`/threads/${idthread}`)
-          // .then((reponse) => {
-          //   this.threads = reponse.data;
-          //   this.$router.go();
-          //   console.log("Thread supprimé !");
-          // })
-          // .catch((error) => {
-          //   console.log(error);
-          //   console.log("FAILURE !!!");
-          // });
-
-      
-
-
-
-      // if (checker()) {
-      //   instance
-      //     .delete(`/threads/${idthread}`)
-      //     .then((reponse) => {
-      //       this.threads = reponse.data;
-      //       this.$router.go();
-      //       console.log("Thread supprimé !");
-      //     })
-      //     .catch((error) => {
-      //       console.log(error);
-      //       console.log("FAILURE !!!");
-      //     });
-      // }
       instance
         .delete(`/threads/${idthread}`)
         .then((reponse) => {
@@ -270,7 +329,7 @@ export default {
           console.log("Thread modifié !");
         })
         .catch((error) => {
-          console.log(error); 
+          console.log(error);
           console.log("UPDATE FAILURE !!!");
         });
     },
@@ -374,6 +433,10 @@ export default {
   line-height: 70px;
 }
 
+i {
+  color: white;
+}
+
 .logo {
   color: whitesmoke;
   text-transform: uppercase;
@@ -408,7 +471,7 @@ export default {
 
 .containerLabelThread {
   display: flex;
-  margin-left: 15%;
+  margin-left: 7%;
 }
 
 .containerLabel {
@@ -420,6 +483,21 @@ export default {
   /* background-color: red; */
   text-align: start;
   font-size: 2rem;
+}
+
+.publication {
+  border: black solid 1px;
+  border-radius: 10px;
+  padding: 10px;
+  width: 50%;
+  margin: auto;
+  margin-bottom: 10px;
+  background: whitesmoke;
+  cursor: pointer;
+}
+
+.publication:hover{
+  background: white;
 }
 
 .label {
@@ -450,8 +528,9 @@ export default {
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
   padding: 5px;
   border-radius: 5px;
-  margin: 4px auto;
+  margin: 10px auto;
   width: 50%;
+  /* width: 500px; */
   display: flex;
 }
 
@@ -461,7 +540,7 @@ export default {
 
 .postThread {
   padding: 5px;
-  border-radius: 50px;
+  border-radius: 0;
   margin: 4px auto;
   width: 40%;
 }
@@ -475,8 +554,9 @@ export default {
   border-radius: 5px;
   /* margin: 4px auto; */
   /* margin: 50px 0px 0px 245px; */
-  width: 68%;
+  width: 62%;
   margin-bottom: 20px;
+  margin-left: 9%;
 }
 
 .title {

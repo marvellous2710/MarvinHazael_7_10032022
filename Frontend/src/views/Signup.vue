@@ -75,3 +75,10 @@ export default {
   },
 };
 </script>
+
+<style >
+.form-control{
+    width: 50%;
+    margin: auto;
+}
+</style>

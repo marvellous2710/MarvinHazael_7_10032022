@@ -63,19 +63,47 @@
                 <label for="file" class="btn btn-primary"
                   ><i class="fas fa-image"></i
                 ></label>
+
+                <div class="btnPublication">
+                  <input
+                    id="file"
+                    type="file"
+                    class="input-file"
+                    accept="image/*"
+                    ref="meuh"
+                    @change="onFilePicked"
+                  />
+                  <div class="dropdown">
+                    <button
+                      class="btn btn-primary dropdown-toggle"
+                      type="button"
+                      id="dropdownMenuButton1"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      Catégories
+                    </button>
+                    <ul
+                      class="dropdown-menu"
+                      aria-labelledby="dropdownMenuButton1"
+                    >
+                      <div class="containerLabelModal">
+                        <div
+                          class="lapizzadelamamma"
+                          :key="categories"
+                          v-for="categories in categories"
+                        >
+                          <a class="dropdown-item" href="#scrollspyHeading5">{{
+                            categories.label
+                          }}</a>
+                          <hr class="dropdown-divider" />
+                        </div>
+                      </div>
+                    </ul>
+                  </div>
+                </div>
               </div>
 
-              <div class="btnPublication">
-                <input
-                  id="file"
-                  type="file"
-                  class="input-file"
-                  accept="image/*"
-                  ref="meuh"
-                  @change="onFilePicked"
-                />
-                <div class="mt-3"></div>
-              </div>
               <div class="modal-body">
                 <img :src="imageUrl" height="150" />
               </div>
@@ -101,10 +129,13 @@
       </div>
     </form>
 
-    <p class="publication" 
-    data-bs-toggle="modal"
-    data-bs-target="#exampleModal"
-    >Publier un commentaire ...</p>
+    <p
+      class="publication"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
+      <i class="fas fa-globe"></i> Publier un commentaire ...
+    </p>
 
     <div class="containerLabelThread">
       <div class="containerLabel">
@@ -174,7 +205,7 @@
                     <i class="fas fa-trash-alt"></i> Supprimer
                   </button>
 
-                  <!-- Modal -->
+                  <!-- Modal DELETE-->
                   <div
                     class="modal fade"
                     id="enerveModal"
@@ -186,7 +217,7 @@
                       <div class="modal-content">
                         <div class="modal-header">
                           <h5 class="modal-title" id="enerveModalLabel">
-                            Modal title
+                            Suppression
                           </h5>
                           <button
                             type="button"
@@ -297,8 +328,8 @@ export default {
       instance
         .get(`/threads/${idthread}`)
         .then((reponse) => {
-          this.threads = reponse.data;
-          this.$router.push("/thread");
+          this.thread = reponse.data;
+          this.$router.push(`/thread/${idthread}`);
         })
         .catch((error) => {
           console.log(error);
@@ -425,7 +456,7 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
 .header {
   background-color: #022c63;
@@ -433,9 +464,6 @@ export default {
   line-height: 70px;
 }
 
-i {
-  color: white;
-}
 
 .logo {
   color: whitesmoke;
@@ -475,12 +503,10 @@ i {
 }
 
 .containerLabel {
-  /* display: flex; */
   border-radius: 5px;
   margin: 4px auto;
   margin-right: 5px;
   width: 10%;
-  /* background-color: red; */
   text-align: start;
   font-size: 2rem;
 }
@@ -489,15 +515,19 @@ i {
   border: black solid 1px;
   border-radius: 10px;
   padding: 10px;
-  width: 50%;
+  width: 40%;
   margin: auto;
   margin-bottom: 10px;
   background: whitesmoke;
   cursor: pointer;
 }
 
-.publication:hover{
+.publication:hover {
   background: white;
+}
+
+.publication {
+  color: black;
 }
 
 .label {
@@ -511,6 +541,7 @@ i {
   color: #022c63;
 }
 
+/* -----------------------------------MODAL ------------------------ */
 .input-file {
   display: none;
 }
@@ -523,6 +554,13 @@ i {
   text-decoration: none;
 }
 
+.sendImage {
+  display: flex;
+  height: 38px;
+  justify-content: space-around;
+}
+
+/* ----------------------------------- FIN MODAL ------------------------ */
 .cardThread {
   background-color: whitesmoke;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
@@ -530,7 +568,6 @@ i {
   border-radius: 5px;
   margin: 10px auto;
   width: 50%;
-  /* width: 500px; */
   display: flex;
 }
 
@@ -543,6 +580,10 @@ i {
   border-radius: 0;
   margin: 4px auto;
   width: 40%;
+}
+
+input.postThread {
+  margin: 0;
 }
 
 /* ---------------------- CARDS ------------------------------*/
@@ -592,21 +633,33 @@ i {
 /*----------------------------------- RESPONSIVE -----------------------------------*/
 
 @media all and (max-width: 800px) {
-  .containerLabelThread {
-    display: inline;
-  }
 
-  .cards {
-    width: auto;
-  }
+.containerLabel {
+  display: none;
+}
 
-  .cardThread {
-    width: 90%;
-  }
+.containerLabelThread {
+  display: inline;
+}
 
-  .categoryBurger {
-    visibility: visible;
-  }
+.publication{
+  margin: 0px 20px 0px 20px;
+  width: auto;
+}
+
+.cards {
+  margin: 0;
+  margin-bottom: 10px;
+  width: auto;
+}
+
+.cardThread {
+  width: 90%;
+}
+
+.categoryBurger {
+  visibility: visible;
+}
 }
 
 /*-----------------------------------FIN RESPONSIVE -----------------------------------*/

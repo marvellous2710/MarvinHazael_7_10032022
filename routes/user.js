@@ -5,13 +5,14 @@ const router         = express.Router();
 
 
 
+
 router.post('/login', userCtrl.login);
 
 router.post('/signup', userCtrl.signup, userMiddleware.validateRegister);
 
 router.put("/", userCtrl.modifyUser);
 
-router.put("/:threadId", userCtrl.modifyPassword);
+router.put("/password", userCtrl.modifyPassword);
 
 router.delete("/:id", userCtrl.deleteUser);
 

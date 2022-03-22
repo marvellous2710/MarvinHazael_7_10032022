@@ -154,16 +154,21 @@ exports.oneUser= (req, res, next) => {}
 
 exports.modifyPassword = (req, res, next) => {
   const mysql      = "UPDATE tableuser SET password = ? WHERE idtableuser = ?";
-  const threadId   = req.params.threadId;
+  const userId     = req.body.userId;
+  //const userId     = req.params.userId;
+  
+  //const userId = localStorage.getItem("user");
 
   bcrypt.hash(req.body.password, 10, (err, hash) => {
+    console.log(req);
     if (err) {
+      console.log(err);
       return res.status(500).send({
         message: err,
       });
     } else {
 
-      db.query(mysql, [ hash, threadId ], (err, result) => {
+      db.query(mysql, [ hash, userId ], (err, result) => {
         if (err) {
           throw err;
           return res.status(400).send({

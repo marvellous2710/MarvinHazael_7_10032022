@@ -15,6 +15,7 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
+  
   {
     path: '/signup',
     name: 'Signup',
@@ -26,14 +27,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue')
   },
   {
-    path: '/thread',
+    path: '/thread/:idthread',
     name: 'Thread',
-    component: () => import(/* webpackChunkName: "login" */ '../views/Thread.vue')
+    component: () => import(/* webpackChunkName: "thread" */ '../views/Thread.vue')
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import(/* webpackChunkName: "login" */ '../views/Profile.vue')
+    component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue')
   }
   
 ]

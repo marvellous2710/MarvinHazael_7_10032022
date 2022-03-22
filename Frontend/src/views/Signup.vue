@@ -35,7 +35,10 @@
       </div>
 
       <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Créer mon compte</button>
+        <button type="submit" 
+        class="btn btn-primary"
+        :disabled="!password.length"
+        >Créer mon compte</button>
       </div>
     </form>
   </div>

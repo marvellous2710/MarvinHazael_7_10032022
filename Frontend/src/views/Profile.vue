@@ -2,69 +2,37 @@
   <div class="containerProfile">
     <h2>Mon profile</h2>
     <hr />
-    <div class="alert alert-success" v-if="isRight">
-      Mot de passe et/ou email incorrect
-    </div>
+    <div class="alert alert-success" v-if="isRight">Mot de passe modifié</div>
 
     <form>
       <div class="form-group">
         <label>Nouveau mot de passe</label>
+      
+         
         <input type="password" class="form-control" v-model="password" />
+      </div>
+      <div class="form-group">
+        <label>Confirmation nouveau mot de passe</label>
+        <input
+          type="password"
+          class="form-control"
+          v-model="confirmPassword"
+          :disabled="!password.length"
+        />
       </div>
 
       <div class="mt-3">
-        <button type="submit" class="btn btn-primary" :disabled="!password.length" @click="changePassword()">
-          Changer votre mot de passe
+        <button
+          type="button"
+          class="btn btn-primary"
+          :disabled="isDisabled"
+          @click="changePassword()"
+        >
+          <i class="fas fa-address-card"></i
+        > Changer votre mot de passe
         </button>
       </div>
     </form>
-
-    <h1>tuto india</h1>
-    <!-- Button trigger modal -->
-    <button
-      type="button"
-      class="btn btn-primary"
-      data-bs-toggle="modal"
-      data-bs-target="#exampleModal"
-    >
-      ENVOYER
-    </button>
-
-    <!-- Modal -->
-    <div
-      class="modal fade"
-      id="exampleModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">HELLO !</div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <h1>FIN tuto india</h1>
   </div>
 </template>
 
@@ -76,15 +44,26 @@ export default {
     return {
       users: "",
       password: "",
+      confirmPassword: "",
       isRight: false,
+      userId: localStorage.getItem('userId')
     };
   },
 
-  methods: {
-    changePassword(iduser) {
-      instance
-        .put(`/users/${iduser}`)
+  computed: {
+    isDisabled: function () {
+      if (!this.password || this.confirmPassword !== this.password) {
+        return true;
+      }
+      return false;
+    },
+  },
 
+  methods: {
+    changePassword() {
+      
+      instance
+        .put(`/users/password/`, { userId: this.userId, password: this.password  })    
         .then((reponse) => {
           this.users = reponse.data;
           this.isRight = true;

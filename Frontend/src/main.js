@@ -7,9 +7,7 @@ import { library }         from '@fortawesome/fontawesome-svg-core';
 import { fas }             from '@fortawesome/free-solid-svg-icons';
 import axios               from 'axios';
 
-//import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
-// // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
 

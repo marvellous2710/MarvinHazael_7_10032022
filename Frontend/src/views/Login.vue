@@ -18,7 +18,7 @@
       </div>
 
       <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Se connecter</button>
+        <button type="submit" class="btn btn-primary" :disabled="!password.length">Se connecter</button>
       </div>
     </form>
   </div>
@@ -46,6 +46,8 @@ export default {
 
           localStorage.setItem('authToken',response.data.token);
           localStorage.setItem('user',response.data.user.email);
+          localStorage.setItem('name',response.data.user.firstname);
+          localStorage.setItem('userId',response.data.user.idtableUser);
           
           this.$router.push("/");
 

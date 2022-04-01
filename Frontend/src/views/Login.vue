@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import axios from "axios";
+
 import { instance } from "../api";
 
 export default {
@@ -46,7 +46,7 @@ export default {
 
           localStorage.setItem('authToken',response.data.token);
           localStorage.setItem('user',response.data.user.email);
-          localStorage.setItem('name',response.data.user.firstname);
+          //localStorage.setItem('firstname',response.data.user.firstname);
           localStorage.setItem('userId',response.data.user.idtableUser);
           
           this.$router.push("/");

@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="hello" >
     <header class="container-fluid header">
       <div class="container">
         <a href="#home" class="logo">Groupomania</a>
@@ -96,6 +96,7 @@
                           <a class="dropdown-item" href="#scrollspyHeading5">{{
                             categories.label
                           }}</a>
+
                           <hr class="dropdown-divider" />
                         </div>
                       </div>
@@ -149,6 +150,8 @@
               {{ categories.label }}
             </div></a
           >
+         
+          
         </div>
       </div>
 
@@ -158,6 +161,7 @@
             <div class="cards">
               <div class="title-container">
                 <div class="title">
+                 
                   <p class="userId">{{ thread.email }}</p>
                   <p class="titre">{{ thread.titre }}</p>
                   <p class="titre">{{ thread.idthread }}</p>
@@ -172,9 +176,12 @@
                 Posté le {{ getFormatedDate(thread.datePost) }}
               </small>
 
-              <form @submit.prevent="">
+              <form @submit.prevent="t">
                 <div class="mt-3">
-                  <button class="btn btn-primary" @click="likeDislikePost()">
+                  <button 
+                   type="submit"
+                   class="btn btn-primary" 
+                   @click="likeDislikePost()">
                     <i class="fas fa-thumbs-up"></i> {{ currentValue }}
                   </button>
                   <button
@@ -193,6 +200,8 @@
                   >
                     <i class="fas fa-edit"></i> Modifier
                   </button>
+
+
 
                   <!-- Button trigger modal -->
                   <button
@@ -247,6 +256,9 @@
                         </div>
                       </div>
                     </div>
+
+                    
+                    
                   </div>
                 </div>
               </form>
@@ -261,7 +273,7 @@
 <script>
 import { instance } from "../api";
 import moment from "moment";
-import axios from "axios";
+
 
 export default {
   name: "HelloWorld",
@@ -272,9 +284,9 @@ export default {
       threads: "",
       threadPost: "",
       titre: "",
-      //email: "",
       user: localStorage.getItem("user"),
       //email: localStorage.getItem("user"),
+      userId: localStorage.getItem("userId"),
       imageUrl: "",
       image: null,
       selectedFile: null,
@@ -287,7 +299,10 @@ export default {
   created() {
     this.page = 1;
 
-    instance
+    const data = localStorage.getItem("authToken");
+
+    if (data) {
+      instance
       .get("/threads/?page=1&size=5")
       .then((reponse) => {
         this.threads = reponse.data;
@@ -321,6 +336,11 @@ export default {
     // instance.get("/like").then((reponse) => {
     //   this.like = reponse.data;
     // });
+    } else {
+      alert('Veuillez vous inscrire pour accèder à Groupomania');
+      this.$router.push("/signup");
+    }
+    
   },
 
   methods: {
@@ -350,20 +370,7 @@ export default {
           console.log("FAILURE !!!");
         });
     },
-    updatePost(idthread) {
-      instance
-        .put(`/threads/${idthread}`)
-        .then((reponse) => {
-          this.threads = reponse.data;
-          //this.$router.go();
-
-          console.log("Thread modifié !");
-        })
-        .catch((error) => {
-          console.log(error);
-          console.log("UPDATE FAILURE !!!");
-        });
-    },
+   
 
     onFilePicked(event) {
       this.image = this.$refs.meuh; //[0];
@@ -393,6 +400,8 @@ export default {
         formData.append("image", this.image.files[0]);
       }
 
+      
+      formData.append("userId", this.userId);
       formData.append("email", this.user);
       formData.append("titre", this.titre);
 
@@ -428,26 +437,28 @@ export default {
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
-    likeDislikePost() {
-      this.currentValue = this.currentValue + 1;
-    },
-
     // likeDislikePost() {
-    // instance
-    //     .post(
-    //       "/like/"
-
-    //     )
-    //     .then((response) => {
-    //       console.log(response);
-    //       //this.$router.go();
-    //       console.log("SUCCESS!!");
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       console.log("FAILURE!!");
-    //     });
+    //   this.currentValue = this.currentValue + 1;
     // },
+
+    likeDislikePost() {
+
+    instance
+        .post(
+          "/threads/like", {
+            idUser   : this.userId,
+            idThread : this.idThread,        
+        })
+        .then((response) => {
+          console.log(response);
+          //this.$router.go();
+          console.log("liké SUCCESS!!");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("pas liké !!");
+        });
+    },
   },
 
   props: {

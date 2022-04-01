@@ -51,22 +51,22 @@ import { instance } from "../api";
 export default {
   data() {
     return {
-      name: "",
-      firstname: "",
-      email: "",
-      password: "",
-      isSuccess: false,
-      comment: "",
+      name      : "",
+      firstname : "",
+      email     : "",
+      password  : "",
+      isSuccess : false,
+      comment   : "",
     };
   },
   methods: {
     onCreateUser() {
       instance
         .post(`/users/signup`, {
-          name: this.name,
-          firstname: this.firstname,
-          email: this.email,
-          password: this.password,
+          name      : this.name,
+          firstname : this.firstname,
+          email     : this.email,
+          password  : this.password,
         })
         .then((response) => {
           this.isSuccess = true;

@@ -1,8 +1,5 @@
 <template>
-
   <div class="oneThread">
-
-   
     <header class="container-fluid header">
       <div class="container">
         <a href="#home" class="logo">Groupomania</a>
@@ -40,23 +37,77 @@
               <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i>
               {{ currentValue }}
             </button>
+           
+
+            <!-- Button trigger modal -->
             <button
-              type="submit"
+              type="button"
               class="btn btn-primary"
-              @click="findOne(thread.idthread)"
+              data-bs-toggle="modal"
+              data-bs-target="#modifyModal"
             >
-              <i class="fas fa-comment-alt"></i> Répondre
+              <i class="fas fa-edit"></i> Modifier
             </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              v-if="user == thread.email"
+
+            <!-- Modal -->
+            <div
+              class="modal fade"
+              id="modifyModal"
+              tabindex="-1"
+              aria-labelledby="exampleModalLabel"
+              aria-hidden="true"
             >
-              <i class="fas fa-edit" @click="updatePost()"></i> Modifier
-            </button>
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                      Modifier votre commentaire
+                    </h5>
+
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <input type="text" class="form-control" v-model="titre" />
+
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      @click="updateThread(thread.idthread)"
+                    >
+                      Modifier
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button class="btn btn-primary" v-if="user == thread.email">
               <i class="fas fa-trash-alt" @click="deletePost()"></i> Supprimer
             </button>
+          </div>
+          <div>
+            <input
+              type="text"
+              class="postThread"
+              v-model="titre"
+              placeholder="Répondre ..."
+            />
+            <button class="btn btn-primary" >
+              <i class="fas fa-paper-plane" @click="repondre()"></i> Envoyer
+            </button>
+            
           </div>
         </form>
       </div>
@@ -76,20 +127,58 @@ export default {
       titre: "",
       //email: "",
       user: localStorage.getItem("user"),
+      userId: localStorage.getItem("userId"),
       //email: localStorage.getItem("user"),
       imageUrl: "",
       image: null,
       selectedFile: null,
       file: "",
-      // idthread: this.$route.params.idthread,
+      idThread: this.$route.params.idthread,
       currentValue: 0,
     };
   },
 
   methods: {
+     likeDislikePost() {
+
+  
+    instance
+        .post(
+          // "/threads/like", {
+          `/threads/${this.$route.params.idthread}/like`, {
+            idUser   : this.userId,
+            idThread : this.idThread,        
+        })
+        .then((response) => {
+          console.log(response);
+          //this.$router.go();
+          console.log("liké SUCCESS!!");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("pas liké !!");
+        });
+    },
     getFormatedDate(date) {
       return moment(String(date)).format("DD-MM-YYYY hh:mm");
     },
+
+    updateThread() {
+      instance
+        .put(`/threads/${this.$route.params.idthread}`, { titre: this.titre })
+        .then((reponse) => {
+          this.users = reponse.data;
+          this.$router.go();
+          console.log(reponse);
+          console.log("THREAD MODIFIE");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("thread pas modifié");
+        });
+    },
+
+   
   },
 
   created() {
@@ -254,23 +343,22 @@ export default {
 /*----------------------------------- RESPONSIVE -----------------------------------*/
 
 @media all and (max-width: 800px) {
-  
-.containerLabelThread {
-  display: inline;
-}
+  .containerLabelThread {
+    display: inline;
+  }
 
-.cards {
-  width: auto;
-  margin: 10px;
-}
+  .cards {
+    width: auto;
+    margin: 10px;
+  }
 
-.cardThread {
-  width: 90%;
-}
+  .cardThread {
+    width: 90%;
+  }
 
-.categoryBurger {
-  visibility: visible;
-}
+  .categoryBurger {
+    visibility: visible;
+  }
 }
 
 /*-----------------------------------FIN RESPONSIVE -----------------------------------*/

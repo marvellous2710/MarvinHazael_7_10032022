@@ -60,8 +60,12 @@ export default {
   },
 
   methods: {
-    changePassword() {
-      
+
+   
+
+   
+       changePassword() {
+     
       instance
         .put(`/users/password/`, { userId: this.userId, password: this.password  })    
         .then((reponse) => {
@@ -75,7 +79,9 @@ export default {
           console.log(error);
           console.log("et non password marche pas");
         });
-    },
+    }
+   
+   
   },
 };
 </script>

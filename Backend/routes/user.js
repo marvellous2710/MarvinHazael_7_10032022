@@ -3,8 +3,7 @@ const userMiddleware = require("../middleware/users");
 const userCtrl       = require('../controllers/user');
 const router         = express.Router();
 
-
-
+//const userCtrl = require('../Backend/../controllers/user');
 
 router.post('/login', userCtrl.login);
 
@@ -17,7 +16,6 @@ router.put("/password", userCtrl.modifyPassword);
 router.delete("/:id", userCtrl.deleteUser);
 
 router.get("/alluser", userCtrl.allUser);
-
 
 
 

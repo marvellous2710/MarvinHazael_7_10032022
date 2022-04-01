@@ -1,7 +1,6 @@
 const bcrypt  = require("bcryptjs");
 const jwt     = require("jsonwebtoken");
-const db      = require(".../lib/db");
-
+const db      = require("../lib/db");
 
 
 exports.login = (req, res, next) => {
@@ -37,8 +36,6 @@ exports.login = (req, res, next) => {
               });
             }
             if (bResult) {
-        
-
                 const token = jwt.sign({
                     email: result[0].username,
                     idtableUser: result[0].idtableUser,
@@ -61,6 +58,7 @@ exports.login = (req, res, next) => {
         }
       );
 };
+
 
 exports.signup = (req, res, next) => {
     const user = ({ email: req.body.email });
@@ -152,3 +150,34 @@ exports.allUser = (req, res, next) => {
 }
 
 exports.oneUser= (req, res, next) => {}
+
+
+
+exports.modifyPassword = (req, res, next) => {
+  const mysql      = "UPDATE tableuser SET password = ? WHERE idtableuser = ?";
+  const userId     = req.body.userId;
+
+
+  bcrypt.hash(req.body.password, 10, (err, hash) => {
+    console.log(req);
+    if (err) {
+      console.log(err);
+      return res.status(500).send({
+        message: err,
+      });
+    } else {
+
+      db.query(mysql, [ hash, userId ], (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(400).send({
+            message: err,
+          });
+        }
+        return res.status(201).send({
+          message: "Password updated !",
+        });
+      });
+    } 
+  });
+};

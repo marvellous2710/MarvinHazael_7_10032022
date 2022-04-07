@@ -322,20 +322,22 @@ export default {
         ++this.page;
         console.log(this.page);
 
-        instance.get(`/threads/?page=${this.page}&size=5`).then((reponse) => {
-          this.threads = this.threads.concat(reponse.data);
-          console.log(this.threads);
+        instance
+          .get(`/threads/?page=${this.page}&size=5`)
+          .then((reponse) => {
+            this.threads = this.threads.concat(reponse.data);
+            console.log(this.threads);
         });
       }
     });
 
-    instance.get("/category").then((reponse) => {
-      this.categories = reponse.data;
+    instance
+      .get("/category")
+      //.get("/threads/category")
+      .then((reponse) => {
+        this.categories = reponse.data;
     });
 
-    // instance.get("/like").then((reponse) => {
-    //   this.like = reponse.data;
-    // });
     } else {
       alert('Veuillez vous inscrire pour accèder à Groupomania');
       this.$router.push("/signup");
@@ -437,9 +439,7 @@ export default {
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
-    // likeDislikePost() {
-    //   this.currentValue = this.currentValue + 1;
-    // },
+  
 
     likeDislikePost() {
 

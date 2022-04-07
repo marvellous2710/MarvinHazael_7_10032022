@@ -61,9 +61,6 @@ export default {
 
   methods: {
 
-   
-
-   
        changePassword() {
      
       instance

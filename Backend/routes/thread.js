@@ -12,11 +12,17 @@ router.get("/", auth, threadCtrl.getAllThread);
 
 router.get("/:threadId", auth,  threadCtrl.getOneThread);
 
+//router.get("/category", threadCtrl.getCategory);
+
+router.get("/liked/:threadId", threadCtrl.liked);
+
+router.get("/countLike/:threadId", threadCtrl.getCountLike);
+
 router.put("/:threadId", threadCtrl.modifyThread);
 
 router.delete("/:threadId", threadCtrl.deleteThread);
 
-router.post("/like", auth, threadCtrl.likeDislike);
+router.post("/:threadId/like", auth, threadCtrl.likeDislike);
 
 
 

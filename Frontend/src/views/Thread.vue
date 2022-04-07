@@ -33,11 +33,22 @@
 
         <form @submit.prevent="">
           <div class="mt-3">
-            <button class="btn btn-primary">
-              <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i>
-              {{ currentValue }}
+            <button  
+            class="btn btn-primary"
+            :disabled="liked">
+              <div class="containerCounter">
+                <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i>
+                <div
+                  class="counter"
+                  :key="countLike"
+                  v-for="countLike in countLike"
+                >
+                  <div class="likeDislike">
+                    {{ countLike }}
+                  </div>
+                </div>
+              </div>
             </button>
-           
 
             <!-- Button trigger modal -->
             <button
@@ -104,10 +115,9 @@
               v-model="titre"
               placeholder="Répondre ..."
             />
-            <button class="btn btn-primary" >
+            <button class="btn btn-primary">
               <i class="fas fa-paper-plane" @click="repondre()"></i> Envoyer
             </button>
-            
           </div>
         </form>
       </div>
@@ -124,11 +134,16 @@ export default {
     return {
       thread: "",
       threadPost: "",
+
+      //liked: false,
+
+      countLike: "",
+
       titre: "",
-      //email: "",
+
       user: localStorage.getItem("user"),
       userId: localStorage.getItem("userId"),
-      //email: localStorage.getItem("user"),
+
       imageUrl: "",
       image: null,
       selectedFile: null,
@@ -138,21 +153,47 @@ export default {
     };
   },
 
-  methods: {
-     likeDislikePost() {
+  computed: {
+    // liked: function () {
+    //   instance
+    //   .get(
+    //     `/threads/liked/${this.$route.params.idthread}`,
+    //     {
+    //       idUser: this.userId,
+    //       idThread: this.idThread,
+    //     })
+    //   .then((reponse) => {
+    //     console.log(reponse);
+    //     this.liked = true;    
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    // }
+    
+     liked: function () {
+      if (!this.password || this.confirmPassword !== this.password) {
+        return true;
+      }
+      return false;
+    },
+  },
 
-  
-    instance
+  methods: {
+    likeDislikePost() {
+      instance
         .post(
           // "/threads/like", {
-          `/threads/${this.$route.params.idthread}/like`, {
-            idUser   : this.userId,
-            idThread : this.idThread,        
-        })
+          `/threads/${this.$route.params.idthread}/like`,
+          {
+            idUser: this.userId,
+            idThread: this.idThread,
+          }
+        )
         .then((response) => {
           console.log(response);
           //this.$router.go();
-          console.log("liké SUCCESS!!");
+          console.log("like SUCCESS!!");
         })
         .catch((error) => {
           console.log(error);
@@ -177,8 +218,19 @@ export default {
           console.log("thread pas modifié");
         });
     },
-
-   
+    getCounterLike() {
+      instance
+        .get(`/threads/${this.$route.params.idthread}`)
+        .then((reponse) => {
+          this.$router.go();
+          console.log(reponse);
+          console.log("counter like saffiche");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("counter like saffiche pas");
+        });
+    },
   },
 
   created() {
@@ -191,6 +243,27 @@ export default {
       .catch((error) => {
         console.log(error);
         console.log("le thread s'affiche pas");
+      });
+
+    instance
+      .get(`/threads/countLike/${this.$route.params.idthread}`)
+      .then((reponse) => {
+        this.countLike = reponse.data[0];
+      });
+
+    instance
+      .get(
+        `/threads/liked/${this.$route.params.idthread}`,
+        {
+          idUser: this.userId,
+          idThread: this.idThread,
+        })
+      .then((reponse) => {
+        console.log(reponse);
+        this.liked = true;    
+      })
+      .catch((error) => {
+        console.log(error);
       });
   },
 };
@@ -340,6 +413,16 @@ export default {
   background-color: cadetblue;
 }
 
+.containerCounter {
+  display: flex;
+}
+.containerCounter i {
+  margin-top: 2px;
+}
+
+.likeDislike {
+  margin-left: 5px;
+}
 /*----------------------------------- RESPONSIVE -----------------------------------*/
 
 @media all and (max-width: 800px) {

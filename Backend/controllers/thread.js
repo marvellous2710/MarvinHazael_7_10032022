@@ -1,79 +1,81 @@
-const { faS } = require("@fortawesome/free-solid-svg-icons");
+//const { faS } = require("@fortawesome/free-solid-svg-icons");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../lib/db");
 
 exports.likeDislike = (req, res, next) => {
 //controler si le user a deja liké CE thread si oui supprimer le like sinon l'insérer
-  // const idUser = req.body.idUser;
-  // const idThread = req.params.idThread;
+  const idUser   = req.body.idUser;
+  const idThread = req.body.idThread;
 
-  // const user = ({ idUser: req.body.idUser, idThread: req.params.idThread });
-  // const mysql = `SELECT * FROM likeDislike WHERE idUser = '${idUser}' AND '${idThread}`;
+  const user  = ({ idUser: req.body.idUser, idThread: req.body.idThread });
+  const mysql = `SELECT * FROM likeDislike WHERE idUser = '${idUser}' AND '${idThread}`;
   
-  // db.query(
-  //   mysql, user, 
-  //   (err, result) => {
-  //     if (result && result.length) {
-  //       const mysql    = "DELETE FROM likeDislike WHERE idlike = ?";
-  //       const threadId = req.params.threadId;
-
-  //     db.query(mysql, [threadId], (err, result) => {
-  //       if (err) {
-  //         throw err;
-  //         return res.status(400).send({
-  //           message: err,
-  //         });
-  //       }
-  //       return res.status(201).send({
-  //         message: "like deleted !",
-  //       });
-  //     });
-  //     } else {
-  //       const mysql = `INSERT INTO likeDislike SET ?`;
-  //       const user = ({ idUser: req.body.idUser, idThread: req.params.idThread });
-      
-  //       db.query(
-  //         mysql,
-  //         user,
-      
-  //         (err, result) => {
-  //           if (err) {
-  //             throw err;
-  //             return res.status(400).send({
-  //               message: err,
-  //             });
-  //           }
-  //           return res.status(201).send({
-  //             message: "liked !",
-  //           });
-  //         }
-  //       );
-  //     }
-  //   }
-  // );
-
-
-  // -------------------- CA MARCHE --------------------------
-  const mysql = `INSERT INTO likeDislike SET ?`;
-  const user = { idUser: req.body.idUser, idThread: req.params.idThread };
-
   db.query(
-    mysql,
-    user,
-
+    mysql, user, 
     (err, result) => {
-      if (err) {
-        throw err;
-        return res.status(400).send({
-          message: err,
+      if (result && result.length) {
+        const mysql  = "DELETE FROM likeDislike WHERE idlike = ?";
+        const idLike = req.body.idlike;
+
+      db.query(mysql, [idLike], (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(400).send({
+            message: err,
+          });
+        }
+        return res.status(201).send({
+          message: "like deleted !",
         });
-      }
-      return res.status(201).send({
-        message: "liked !",
       });
+      } else {
+        const mysql = `INSERT INTO likeDislike SET ?`;
+        const user = ({ idUser: req.body.idUser, idThread: req.body.idThread });
+      
+        db.query(
+          mysql,
+          user,
+      
+          (err, result) => {
+            if (err) {
+              throw err;
+              return res.status(400).send({
+                message: err,
+              });
+            }
+            return res.status(201).send({
+              message: "liked !",
+            });
+          }
+        );
+      }
     }
   );
+ 
+ 
+  // -------------------- CA MARCHE --------------------------
+  // const mysql = `INSERT INTO likeDislike SET ?`;
+  // const user = ({ idUser: req.body.idUser, idThread: req.body.idThread }); 
+  
+  
+
+  // db.query(
+  //   mysql,
+  //   user,
+
+  //   (err, result) => {
+  //     if (err) {
+  //       throw err;
+  //       return res.status(400).send({
+  //         message: err,
+  //       });
+  //     }
+  //     return res.status(201).send({
+  //       message: "liked !",
+  //     });
+  //   }
+  // );
 };
 
 exports.createThread = (req, res, next) => {
@@ -110,6 +112,7 @@ exports.createThread = (req, res, next) => {
   });
 };
 
+
 exports.getAllThread = (req, res, next) => {
   const size       = req.query.size;
   const pageNumber = req.query.page;
@@ -130,7 +133,7 @@ exports.getAllThread = (req, res, next) => {
 };
 
 exports.getOneThread = (req, res, next) => {
-  const mysql = "SELECT * FROM thread WHERE idthread = ?";
+  const mysql    = "SELECT * FROM thread WHERE idthread = ?";
   const threadId = req.params.threadId;
 
   db.query(mysql, [threadId], (err, result) => {
@@ -149,6 +152,23 @@ exports.getOneThread = (req, res, next) => {
     return res.status(201).send(result[0]);
   });
 };
+
+
+exports.getCategory = (req, res, next) => {
+  const mysql = "SELECT * FROM categories";
+
+  db.query(mysql, (err, result) => {
+    if (err) {
+      return res.status(400).send({
+        message: err,
+      });
+    }
+    return res.status(201).send(result);
+  });
+  return res.status(201);
+};
+
+
 
 exports.modifyThread = (req, res, next) => {
   const mysql = "UPDATE thread SET titre = ? WHERE idthread = ?";
@@ -169,7 +189,7 @@ exports.modifyThread = (req, res, next) => {
 };
 
 exports.deleteThread = (req, res, next) => {
-  const mysql = "DELETE FROM thread WHERE idthread = ?";
+  const mysql    = "DELETE FROM thread WHERE idthread = ?";
   const threadId = req.params.threadId;
   const filename = threadId.imageUrl.split("/images/")[1];
 
@@ -220,19 +240,42 @@ exports.deleteThread = (req, res, next) => {
 };
 
 
-exports.countLike = (req, res, next) => {
-  //il faut savoir combien il y a de like sur CE thread !
-  const mysql = "SELECT COUNT(idUser) FROM likeDislike";
 
-  db.query(mysql, (err, result) => {
+exports.getCountLike = (req, res, next) => {
+  //il faut savoir combien il y a de like sur CE thread !
+  
+  const mysql    = "SELECT COUNT(*) FROM likeDislike WHERE idThread = ?";
+  const threadId = req.params.threadId;
+
+  db.query(mysql, [threadId], (err, result) => {
     if (err) {
       throw err;
       return res.status(400).send({
         message: err,
       });
     }
-    return res.status(201).send({
-      message: "Voici le nombre de like !",
-    });
+
+    return res.status(201).send(result);
+   
   });
+};
+
+exports.liked = (req, res, next) => {
+  //si userID déja présent dans la bdd sur CE thread alors liké sinon pas liké
+  const userId   = req.body.userId;
+  const idThread = req.params.idThread;
+
+  const user  = ({ idUser: req.body.userId, idThread: req.params.idThread });
+  const mysql = `SELECT * FROM likeDislike WHERE idUser = '${userId}' AND '${idThread}`;
+  
+  db.query(
+    mysql, user,
+    (err, result) => {
+      if (result && result.length) {
+        return res.status(201).send(true);
+      } else {
+        return res.status(400).send(false);
+      }
+    }
+  )
 };

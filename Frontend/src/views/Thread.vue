@@ -35,7 +35,7 @@
           <div class="mt-3">
             <button  
             class="btn btn-primary"
-            :disabled="liked">
+            >
               <div class="containerCounter">
                 <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i>
                 <div
@@ -135,7 +135,7 @@ export default {
       thread: "",
       threadPost: "",
 
-      //liked: false,
+     
 
       countLike: "",
 
@@ -154,45 +154,34 @@ export default {
   },
 
   computed: {
-    // liked: function () {
-    //   instance
-    //   .get(
-    //     `/threads/liked/${this.$route.params.idthread}`,
-    //     {
-    //       idUser: this.userId,
-    //       idThread: this.idThread,
-    //     })
-    //   .then((reponse) => {
-    //     console.log(reponse);
-    //     this.liked = true;    
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-    // }
+   
     
-     liked: function () {
-      if (!this.password || this.confirmPassword !== this.password) {
-        return true;
-      }
-      return false;
-    },
+    //  liked: function () {
+    //   if (!this.password || this.confirmPassword !== this.password) {
+    //     return true;
+    //   }
+    //   return false;
+    // },
   },
 
   methods: {
     likeDislikePost() {
+      //console.log(idThread);
       instance
         .post(
-          // "/threads/like", {
-          `/threads/${this.$route.params.idthread}/like`,
+          // "/threads/like", 
+          
+          `/threads/${this.$route.params.idThread}/like`,
           {
             idUser: this.userId,
+            
             idThread: this.idThread,
           }
         )
         .then((response) => {
           console.log(response);
           //this.$router.go();
+          this.liked = false;
           console.log("like SUCCESS!!");
         })
         .catch((error) => {
@@ -200,6 +189,26 @@ export default {
           console.log("pas liké !!");
         });
     },
+
+    
+
+    // likedOrNot() {
+    //  instance
+    //   .get(
+    //     `/threads/liked/${this.$route.params.idthread}`)
+    //   .then((reponse) => {
+    //     console.log(reponse);
+    //     this.liked = true;    
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    //   return true;
+    // },
+
+
+
+
     getFormatedDate(date) {
       return moment(String(date)).format("DD-MM-YYYY hh:mm");
     },
@@ -218,19 +227,7 @@ export default {
           console.log("thread pas modifié");
         });
     },
-    getCounterLike() {
-      instance
-        .get(`/threads/${this.$route.params.idthread}`)
-        .then((reponse) => {
-          this.$router.go();
-          console.log(reponse);
-          console.log("counter like saffiche");
-        })
-        .catch((error) => {
-          console.log(error);
-          console.log("counter like saffiche pas");
-        });
-    },
+    
   },
 
   created() {
@@ -249,22 +246,21 @@ export default {
       .get(`/threads/countLike/${this.$route.params.idthread}`)
       .then((reponse) => {
         this.countLike = reponse.data[0];
-      });
-
-    instance
-      .get(
-        `/threads/liked/${this.$route.params.idthread}`,
-        {
-          idUser: this.userId,
-          idThread: this.idThread,
-        })
-      .then((reponse) => {
-        console.log(reponse);
-        this.liked = true;    
       })
       .catch((error) => {
         console.log(error);
       });
+
+    // instance
+    //   .get(
+    //     `/threads/liked/${this.$route.params.idthread}`)
+    //   .then((reponse) => {
+    //     console.log(reponse);
+    //     this.liked = true;    
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   },
 };
 </script>

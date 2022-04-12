@@ -6,19 +6,24 @@ const db = require("../lib/db");
 exports.likeDislike = (req, res, next) => {
 //controler si le user a deja liké CE thread si oui supprimer le like sinon l'insérer
   const idUser   = req.body.idUser;
+  console.log(idUser);
   const idThread = req.body.idThread;
+  console.log(idThread);
 
-  const user  = ({ idUser: req.body.idUser, idThread: req.body.idThread });
-  const mysql = `SELECT * FROM likeDislike WHERE idUser = '${idUser}' AND '${idThread}`;
+  const user = ({ idUser: req.body.idUser, idThread: req.body.idThread });
+  const mysql = `SELECT * FROM likeDislike WHERE idUser = ${idUser} AND idThread = ${idThread}`;
   
-  db.query(
-    mysql, user, 
-    (err, result) => {
-      if (result && result.length) {
-        const mysql  = "DELETE FROM likeDislike WHERE idlike = ?";
-        const idLike = req.body.idlike;
 
-      db.query(mysql, [idLike], (err, result) => {
+  db.query(
+    mysql, user,
+    (err, result) => {
+      console.log(result);
+      if (result && result.length) {
+        const mysql = `DELETE FROM likeDislike WHERE idUser = ${idUser} AND idThread = ${idThread}`;
+        
+      db.query(
+        mysql, user,
+        (err, result) => {
         if (err) {
           throw err;
           return res.status(400).send({
@@ -27,7 +32,9 @@ exports.likeDislike = (req, res, next) => {
         }
         return res.status(201).send({
           message: "like deleted !",
+          
         });
+        console.log("NACHAAAAVE");
       });
       } else {
         const mysql = `INSERT INTO likeDislike SET ?`;
@@ -260,21 +267,26 @@ exports.getCountLike = (req, res, next) => {
   });
 };
 
-exports.liked = (req, res, next) => {
+exports.getLiked = (req, res, next) => {
   //si userID déja présent dans la bdd sur CE thread alors liké sinon pas liké
   const userId   = req.body.userId;
-  const idThread = req.params.idThread;
+  //const idThread = req.params.idThread;
 
-  const user  = ({ idUser: req.body.userId, idThread: req.params.idThread });
-  const mysql = `SELECT * FROM likeDislike WHERE idUser = '${userId}' AND '${idThread}`;
-  
+  //const user  = ({ idUser: req.body.userId, idThread: req.params.idThread });
+  const user = ({ idUser : req.body.userId });
+  // const mysql = `SELECT * FROM likeDislike WHERE idUser = '${userId}' AND '${idThread}`;
+  const mysql = `SELECT * FROM likeDislike WHERE idUser = ${user} AND idThread = ?`;
+  const threadId = req.params.threadId;
+
   db.query(
-    mysql, user,
+    mysql, [threadId], 
     (err, result) => {
       if (result && result.length) {
-        return res.status(201).send(true);
+       
+        return res.status(201).send(result[0]);
       } else {
-        return res.status(400).send(false);
+        
+        return res.status(401).send(false);
       }
     }
   )

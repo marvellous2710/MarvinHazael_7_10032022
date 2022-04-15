@@ -604,8 +604,6 @@ input.postThread {
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
   padding: 10px;
   border-radius: 5px;
-  /* margin: 4px auto; */
-  /* margin: 50px 0px 0px 245px; */
   width: 62%;
   margin-bottom: 20px;
   margin-left: 9%;

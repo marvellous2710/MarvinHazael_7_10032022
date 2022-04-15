@@ -31,11 +31,9 @@
           Posté le {{ getFormatedDate(thread.datePost) }}
         </small>
 
-        <form @submit.prevent="">
+        <form @submit.prevent="postComment">
           <div class="mt-3">
-            <button  
-            class="btn btn-primary"
-            >
+            <button :class="[btnLiked]">
               <div class="containerCounter">
                 <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i>
                 <div
@@ -115,11 +113,114 @@
               v-model="titre"
               placeholder="Répondre ..."
             />
-            <button class="btn btn-primary">
-              <i class="fas fa-paper-plane" @click="repondre()"></i> Envoyer
+            <button class="btn btn-primary" :disabled="!titre.length">
+              <i class="fas fa-paper-plane"></i> Envoyer
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <div class="containerCom">
+      <div :key="comment" v-for="comment in comments">
+        <div class="containerComments">
+          <div class="cardsComments">
+            <div class="title-container">
+              <div class="title">
+                <p class="userId">{{ comment.email }}</p>
+                <p class="titre">{{ comment.titre }}</p>
+                <p class="titre">{{ comment.idthread }}</p>
+              </div>
+            </div>
+
+            <small class="date">
+              Posté le {{ getFormatedDate(comment.datePost) }}
+            </small>
+
+            <form @submit.prevent="t">
+              <div class="mt-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  @click="likeDislikePost()"
+                >
+                  <i class="fas fa-thumbs-up"></i> {{ currentValue }}
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  @click="findOne(thread.idthread)"
+                >
+                  <i class="fas fa-comment-alt"></i> Répondre
+                </button>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  v-if="user == thread.email"
+                  @click="updatePost()"
+                >
+                  <i class="fas fa-edit"></i> Modifier
+                </button>
+
+                <!-- Button trigger modal -->
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#enerveModal"
+                  v-if="user == thread.email"
+                >
+                  <i class="fas fa-trash-alt"></i> Supprimer
+                </button>
+
+                <!-- Modal DELETE-->
+                <div
+                  class="modal fade"
+                  id="enerveModal"
+                  tabindex="-1"
+                  aria-labelledby="enerveModalLabel"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="enerveModalLabel">
+                          Suppression
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div class="modal-body">
+                        Voulez-vous vraiment supprimer ce commentaire ?
+                      </div>
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal"
+                        >
+                          Annuler
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          @click="deletePost(thread.idthread)"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -134,54 +235,61 @@ export default {
     return {
       thread: "",
       threadPost: "",
-
-     
-
       countLike: "",
-
       titre: "",
-
       user: localStorage.getItem("user"),
       userId: localStorage.getItem("userId"),
-
       imageUrl: "",
       image: null,
       selectedFile: null,
       file: "",
       idThread: this.$route.params.idthread,
       currentValue: 0,
+
+      comments: "",
+
+      btnLiked: "btn btn-primary",
     };
   },
 
-  computed: {
-   
-    
-    //  liked: function () {
-    //   if (!this.password || this.confirmPassword !== this.password) {
-    //     return true;
-    //   }
-    //   return false;
-    // },
-  },
-
   methods: {
-    likeDislikePost() {
-      //console.log(idThread);
+    postComment() {
+      const formData = new FormData();
+
+      if (this.image) {
+        formData.append("image", this.image.files[0]);
+      }
+
+      formData.append("userId", this.userId);
+      formData.append("email", this.user);
+      formData.append("titre", this.titre);
+      formData.append("idThread", this.idThread);
+
       instance
-        .post(
-          // "/threads/like", 
-          
-          `/threads/${this.$route.params.idThread}/like`,
-          {
-            idUser: this.userId,
-            
-            idThread: this.idThread,
-          }
-        )
+        .post(`/threads/comment/${this.$route.params.idthread}`, formData, {
+          "Content-Type": "multipart/form-data",
+        })
+        .then((response) => {
+          console.log(response);
+          this.$router.go();
+          console.log("SUCCESS!!");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("FAILURE!!");
+        });
+    },
+
+    likeDislikePost() {
+      instance
+        .post(`/threads/${this.$route.params.idThread}/like`, {
+          idUser: this.userId,
+          idThread: this.idThread,
+        })
         .then((response) => {
           console.log(response);
           //this.$router.go();
-          this.liked = false;
+          this.btnLiked = "btn btn-success";
           console.log("like SUCCESS!!");
         })
         .catch((error) => {
@@ -190,24 +298,23 @@ export default {
         });
     },
 
-    
-
-    // likedOrNot() {
-    //  instance
-    //   .get(
-    //     `/threads/liked/${this.$route.params.idthread}`)
-    //   .then((reponse) => {
-    //     console.log(reponse);
-    //     this.liked = true;    
+    // alreadyLiked() {
+    //   `/threads/${this.$route.params.idThread}/liked`,
+    //   {
+    //     idUser : this.userId,
+    //     idThread : this.idThread,
+    //   }
+    //   .then((response) => {
+    //     console.log(response);
+    //     //this.$router.go();
+    //     this.btnLiked = "btn-success";
+    //     console.log("already liked !!");
     //   })
     //   .catch((error) => {
     //     console.log(error);
+    //     console.log("t'es dans lerreur");
     //   });
-    //   return true;
     // },
-
-
-
 
     getFormatedDate(date) {
       return moment(String(date)).format("DD-MM-YYYY hh:mm");
@@ -227,7 +334,6 @@ export default {
           console.log("thread pas modifié");
         });
     },
-    
   },
 
   created() {
@@ -243,6 +349,17 @@ export default {
       });
 
     instance
+      .get(`/threads/comments/${this.$route.params.idthread}`)
+      .then((reponse) => {
+        this.comments = reponse.data;
+
+        console.log(this.comments);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    instance
       .get(`/threads/countLike/${this.$route.params.idthread}`)
       .then((reponse) => {
         this.countLike = reponse.data[0];
@@ -251,15 +368,18 @@ export default {
         console.log(error);
       });
 
+    // pour afficher que le like est bien liké par le user connecté
     // instance
-    //   .get(
-    //     `/threads/liked/${this.$route.params.idthread}`)
-    //   .then((reponse) => {
-    //     console.log(reponse);
-    //     this.liked = true;    
+    //   .get(`/threads/${this.$route.params.idthread}/liked`)
+    //   .then((response) => {
+    //     console.log(response);
+    //     //this.$router.go();
+    //     this.btnLiked = "btn-success";
+    //     console.log("already liked !!");
     //   })
     //   .catch((error) => {
     //     console.log(error);
+    //     console.log("t'es dans l'erreur");
     //   });
   },
 };
@@ -376,7 +496,7 @@ export default {
   padding: 10px;
   border-radius: 5px;
   width: 50%;
-  margin: auto;
+  margin: 10px auto;
 }
 
 .title {
@@ -419,6 +539,19 @@ export default {
 .likeDislike {
   margin-left: 5px;
 }
+
+/*----------------------------------- COMMENTS -----------------------------------*/
+
+.cardsComments {
+  background-color: whitesmoke;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
+  padding: 10px;
+  border-radius: 5px;
+  width: 50%;
+  margin: 10px auto;
+  
+}
+
 /*----------------------------------- RESPONSIVE -----------------------------------*/
 
 @media all and (max-width: 800px) {

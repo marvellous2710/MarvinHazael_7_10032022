@@ -14,7 +14,7 @@ router.get("/:threadId", auth,  threadCtrl.getOneThread);
 
 //router.get("/category", threadCtrl.getCategory);
 
-router.get("/liked/:threadId", threadCtrl.getLiked);
+//router.get("/liked/:threadId", threadCtrl.getLiked);
 
 router.get("/countLike/:threadId", threadCtrl.getCountLike);
 
@@ -25,6 +25,14 @@ router.delete("/:threadId", threadCtrl.deleteThread);
 //router.post("/:threadId/like", auth, threadCtrl.likeDislike);
 
 router.post("/:threadId/like", auth, threadCtrl.likeDislike);
+
+router.get("/:threadId/liked", auth, threadCtrl.getLiked);
+
+
+
+router.post("/comment/:threadId", auth, multer,threadCtrl.createComment);
+
+router.get("/comments/:threadId", auth, multer,threadCtrl.getAllComment);
 
 
 module.exports = router;

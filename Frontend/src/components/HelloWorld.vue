@@ -20,17 +20,13 @@
       id="formulaire"
     >
       <div class="cardThread">
-        <div class="user">{{ user }}</div>
-
-        <!-- Button trigger modal -->
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#exampleModal"
-        >
-          Publier un commentaire ...
-        </button>
+        <p
+      class="publication"
+      data-bs-toggle="modal"
+      data-bs-target="#exampleModal"
+    >
+      <i class="fas fa-globe"></i> Publier un commentaire ...
+    </p>
 
         <!-- Modal -->
         <div
@@ -60,6 +56,7 @@
                   v-model="titre"
                   placeholder="Publier ..."
                 />
+                
                 <label for="file" class="btn btn-primary"
                   ><i class="fas fa-image"></i
                 ></label>
@@ -101,6 +98,7 @@
                         </div>
                       </div>
                     </ul>
+                   
                   </div>
                 </div>
               </div>
@@ -130,13 +128,7 @@
       </div>
     </form>
 
-    <p
-      class="publication"
-      data-bs-toggle="modal"
-      data-bs-target="#exampleModal"
-    >
-      <i class="fas fa-globe"></i> Publier un commentaire ...
-    </p>
+
 
     <div class="containerLabelThread">
       <div class="containerLabel">
@@ -169,7 +161,7 @@
               </div>
 
               <div class="picture">
-                <img :src="thread.image" />
+                <img :src="thread.content" />
               </div>
 
               <small class="date">
@@ -181,8 +173,19 @@
                   <button 
                    type="submit"
                    class="btn btn-primary" 
-                   @click="likeDislikePost()">
-                    <i class="fas fa-thumbs-up"></i> {{ currentValue }}
+                   @click="likeDislikePost(thread.idthread)">
+                    <div class="containerCounter">
+                <i class="fas fa-thumbs-up" ></i>
+                <div
+                  class="counter"
+                  :key="countLike"
+                  v-for="countLike in countLike"
+                >
+                  <div class="likeDislike">
+                    {{ thread.countLike }}
+                  </div>
+                </div>
+              </div>
                   </button>
                   <button
                     type="submit"
@@ -292,11 +295,13 @@ export default {
       selectedFile: null,
       file: "",
       //idthread: this.$route.params.idthread,
-      currentValue: 0,
+    
+      countLike: "",
+      idthread: "",
     };
   },
 
-  created() {
+  created(idthread) {
     this.page = 1;
 
     const data = localStorage.getItem("authToken");
@@ -338,6 +343,20 @@ export default {
         this.categories = reponse.data;
     });
 
+
+
+    instance
+      // .get(`/threads/countLike/${idthread}`)
+      .get(`/threads/countLike/${idthread}`)
+      
+      .then((reponse) => {
+        console.log(reponse);
+        this.countLike = reponse.data[0];
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
     } else {
       alert('Veuillez vous inscrire pour accèder à Groupomania');
       this.$router.push("/signup");
@@ -357,6 +376,22 @@ export default {
           console.log(error);
           console.log("FAILURE!!");
         });
+    },
+
+    likeDislikePost(idthread) {
+      instance
+        .post(`/threads/${idthread}/like`,{
+          idUser: this.userId,
+          idThread: `${idthread}`,
+        })
+        .then((response) => {
+          console.log(response);
+          console.log("like SUCCESSFULL home");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("pas liké home");
+        })
     },
 
     deletePost(idthread) {
@@ -441,24 +476,6 @@ export default {
     },
   
 
-    likeDislikePost() {
-
-    instance
-        .post(
-          "/threads/like", {
-            idUser   : this.userId,
-            idThread : this.idThread,        
-        })
-        .then((response) => {
-          console.log(response);
-          //this.$router.go();
-          console.log("liké SUCCESS!!");
-        })
-        .catch((error) => {
-          console.log(error);
-          console.log("pas liké !!");
-        });
-    },
   },
 
   props: {
@@ -573,7 +590,7 @@ export default {
 
 /* ----------------------------------- FIN MODAL ------------------------ */
 .cardThread {
-  background-color: whitesmoke;
+  
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
   padding: 5px;
   border-radius: 5px;
@@ -637,6 +654,22 @@ input.postThread {
 .subforum-column {
   border-radius: 5px;
   background-color: cadetblue;
+}
+
+.containerCounter {
+  display: flex;
+}
+
+.containerCounter i {
+  margin-top: 2px;
+}
+
+.likeDislike {
+  margin-left: 5px;
+}
+
+.cardThread p {
+  width: 100%;
 }
 
 /*----------------------------------- RESPONSIVE -----------------------------------*/

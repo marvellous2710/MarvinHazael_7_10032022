@@ -3,9 +3,10 @@ const jwt     = require("jsonwebtoken");
 const db      = require("../lib/db");
 
 
+
 exports.login = (req, res, next) => {
     const user = ({ email: req.body.email});  
-    const mysql = `SELECT * FROM tableUser WHERE ?`;
+    const mysql = `SELECT * FROM users WHERE ?`;
   
     db.query(
       mysql,user,
@@ -38,7 +39,7 @@ exports.login = (req, res, next) => {
             if (bResult) {
                 const token = jwt.sign({
                     email       : result[0].username,
-                    idtableUser : result[0].idtableUser,
+                    idUser : result[0].idUser,
                   },
                   "SECRETKEY",
                   { expiresIn: "7d" }
@@ -62,7 +63,7 @@ exports.login = (req, res, next) => {
 
 exports.signup = (req, res, next) => {
     const user = ({ email: req.body.email });
-    const mysql = `SELECT idtableUser FROM tableUser WHERE LOWER(email) = LOWER ?`;
+    const mysql = `SELECT idUser FROM users WHERE LOWER(email) = LOWER ?`;
   //on compare si l'utilisateur existe avant de l'enregistrer
   db.query(
     mysql,user,
@@ -79,7 +80,7 @@ exports.signup = (req, res, next) => {
             });
           } else {    
             const user = ({ email: req.body.email, password: hash });
-            const mysql = `INSERT INTO tableUser SET ?`;
+            const mysql = `INSERT INTO users SET ?`;
       
             db.query(
                 mysql,
@@ -106,7 +107,7 @@ exports.signup = (req, res, next) => {
 
 exports.modifyUser = (req, res, next) => {
     //si pas d'id ça marche quand meme sur postman mais pas dans mysql
-    const mysql = 'UPDATE tableuser SET `name` = ?, `firstname` = ?,`profilepicture` = ?, `description`= ? WHERE idtableuser = ?';
+    const mysql = 'UPDATE users SET `name` = ?, `firstname` = ?,`profilepicture` = ?, `description`= ? WHERE user = ?';
     const user = req.body; 
     const data = [user.name, user.firstname, user.profilepicture, user.description, user.idtableUser];
          
@@ -133,7 +134,7 @@ exports.deleteUser = (req, res, next) => {
 }
 
 exports.allUser = (req, res, next) => {
-  const mysql = 'SELECT * FROM tableuser ';
+  const mysql = 'SELECT * FROM users ';
 
   db.query(
       mysql,
@@ -154,7 +155,7 @@ exports.oneUser= (req, res, next) => {}
 
 
 exports.modifyPassword = (req, res, next) => {
-  const mysql      = "UPDATE tableuser SET password = ? WHERE idtableuser = ?";
+  const mysql      = "UPDATE users SET password = ? WHERE idUser = ?";
   const userId     = req.body.userId;
 
 

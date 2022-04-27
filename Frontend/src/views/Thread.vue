@@ -24,7 +24,7 @@
         </div>
 
         <div class="picture">
-          <img :src="thread.image" />
+          <img :src="thread.content" />
         </div>
 
         <small class="date">
@@ -35,7 +35,7 @@
           <div class="mt-3">
             <button :class="[btnLiked]">
               <div class="containerCounter">
-                <i class="fas fa-thumbs-up" @click="likeDislikePost()"></i>
+                <i class="fas fa-thumbs-up" @click="likeDislikePost(thread.idthread)"></i>
                 <div
                   class="counter"
                   :key="countLike"
@@ -142,18 +142,11 @@
                 <button
                   type="submit"
                   class="btn btn-primary"
-                  @click="likeDislikePost()"
+                  @click="commentLike(comment.idComment)"
                 >
                   <i class="fas fa-thumbs-up"></i> {{ currentValue }}
                 </button>
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  @click="findOne(thread.idthread)"
-                >
-                  <i class="fas fa-comment-alt"></i> Répondre
-                </button>
-
+              
                 <button
                   type="submit"
                   class="btn btn-primary"
@@ -247,6 +240,7 @@ export default {
       currentValue: 0,
 
       comments: "",
+      idComment: "",
 
       btnLiked: "btn btn-primary",
     };
@@ -295,6 +289,23 @@ export default {
         .catch((error) => {
           console.log(error);
           console.log("pas liké !!");
+        });
+    },
+    commentLike(idComment) {
+      instance
+        .post(`/threads/${idComment}/commentLike`, {
+          idUser: this.userId,
+          idComment: `${idComment}`,
+        })
+        .then((response) => {
+          console.log(response);
+          //this.$router.go();
+          // this.btnLiked = "btn btn-success";
+          console.log("comment like SUCCESS!!");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("comment pas liké !!");
         });
     },
 
@@ -370,7 +381,7 @@ export default {
 
     // pour afficher que le like est bien liké par le user connecté
     // instance
-    //   .get(`/threads/${this.$route.params.idthread}/liked`)
+    //   .get(`/threads/liked/${this.$route.params.idthread}`)
     //   .then((response) => {
     //     console.log(response);
     //     //this.$router.go();
@@ -486,6 +497,7 @@ export default {
   border-radius: 50px;
   margin: 4px auto;
   width: 40%;
+  border: none;
 }
 
 /* ---------------------- CARDS ------------------------------*/

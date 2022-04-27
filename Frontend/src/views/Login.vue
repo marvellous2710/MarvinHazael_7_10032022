@@ -47,7 +47,7 @@ export default {
           localStorage.setItem('authToken',response.data.token);
           localStorage.setItem('user',response.data.user.email);
           //localStorage.setItem('firstname',response.data.user.firstname);
-          localStorage.setItem('userId',response.data.user.idtableUser);
+          localStorage.setItem('userId',response.data.user.idUser);
           
           this.$router.push("/");
 

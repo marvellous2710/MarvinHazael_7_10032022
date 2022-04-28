@@ -124,14 +124,30 @@ exports.getAllThread = (req, res, next) => {
   const offset     = (pageNumber - 1) * size;
 
   //const mysql = `SELECT * FROM thread ORDER BY datePost DESC LIMIT ${size} OFFSET ${offset}`; //DESC pour afficher les thread par le dernier posté
+  // const mysql = `
+  //   SELECT u.email, t.idthread, t.titre, t.datePost, t.content 
+  //   FROM users u 
+  //   INNER JOIN thread t 
+  //   ON u.idUser = t.userId
+  //   ORDER BY datePost 
+  //   DESC LIMIT ${size} 
+  //   OFFSET ${offset} `;
+  
   const mysql = `
-    SELECT u.email, t.idthread, t.titre, t.datePost, t.content 
-    FROM users u 
-    INNER JOIN thread t 
-    ON u.idUser = t.userId
-    ORDER BY datePost 
-    DESC LIMIT ${size} 
-    OFFSET ${offset} `;
+    SELECT t.idthread, t.titre, t.datePost, t.content, t.idCategory, u.email,
+    SUM(CASE WHEN tl.idThread IS NOT NULL THEN 1 ELSE 0 END) nbLike,
+    CASE WHEN utl.idUser IS NOT NULL THEN 1 ELSE 0 END isLikedByConnectedUser
+    FROM thread t
+    LEFT JOIN likeDislike tl
+    ON t.idthread = tl.idThread
+    JOIN users u
+    ON t.userId = u.idUser
+    LEFT JOIN likeDislike utl
+    ON t.idthread = utl.idThread AND utl.idUser = 55
+    GROUP BY t.idthread, t.titre, t.datePost, t.idCategory, u.email, t.content, utl.idUser
+    ORDER BY t.idthread 
+    DESC LIMIT ${size}
+    OFFSET ${offset}`;
 
   db.query(mysql, (err, result) => {
     if (err) {

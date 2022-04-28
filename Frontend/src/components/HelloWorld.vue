@@ -182,7 +182,7 @@
                   v-for="countLike in countLike"
                 >
                   <div class="likeDislike">
-                    {{ thread.countLike }}
+                    {{ countLike }}
                   </div>
                 </div>
               </div>
@@ -311,6 +311,7 @@ export default {
       .get("/threads/?page=1&size=5")
       .then((reponse) => {
         this.threads = reponse.data;
+        this.countLike = reponse.data[0].nbLike;
         console.log(this.threads);
       })
       .catch((error) => {
@@ -345,17 +346,17 @@ export default {
 
 
 
-    instance
-      // .get(`/threads/countLike/${idthread}`)
-      .get(`/threads/countLike/${idthread}`)
+    // instance
+    //   // .get(`/threads/countLike/${idthread}`)
+    //   .get(`/threads/countLike/${idthread}`)
       
-      .then((reponse) => {
-        console.log(reponse);
-        this.countLike = reponse.data[0];
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    //   .then((reponse) => {
+    //     console.log(reponse);
+    //     this.countLike = reponse.data[0];
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
 
     } else {
       alert('Veuillez vous inscrire pour accèder à Groupomania');

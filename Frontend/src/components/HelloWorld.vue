@@ -1,12 +1,9 @@
 <template>
-  <div class="hello" >
+  <div class="hello">
     <header class="container-fluid header">
       <div class="container">
-        <a href="#home" class="logo">Groupomania</a>
+        <a href="/" class="logo">Groupomania</a>
         <nav class="menu">
-          <a href="#category" class="categoryBurger"
-            ><i class="fas fa-utensils"></i
-          ></a>
           <a href="/"><i class="fas fa-globe"></i></a>
           <a href="/profile"><i class="fas fa-user-alt"></i></a>
           <a @click.prevent="disconnect"><i class="fas fa-sign-out-alt"></i></a>
@@ -21,12 +18,12 @@
     >
       <div class="cardThread">
         <p
-      class="publication"
-      data-bs-toggle="modal"
-      data-bs-target="#exampleModal"
-    >
-      <i class="fas fa-globe"></i> Publier un commentaire ...
-    </p>
+          class="publication"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+        >
+          <i class="fas fa-globe"></i> Publier un commentaire ...
+        </p>
 
         <!-- Modal -->
         <div
@@ -56,7 +53,7 @@
                   v-model="titre"
                   placeholder="Publier ..."
                 />
-                
+
                 <label for="file" class="btn btn-primary"
                   ><i class="fas fa-image"></i
                 ></label>
@@ -87,18 +84,17 @@
                       <div class="containerLabelModal">
                         <div
                           class="lapizzadelamamma"
-                          :key="categories"
-                          v-for="categories in categories"
+                          :key="categorie"
+                          v-for="categorie in categories"
                         >
                           <a class="dropdown-item" href="#scrollspyHeading5">{{
-                            categories.label
+                            categorie.label
                           }}</a>
 
                           <hr class="dropdown-divider" />
                         </div>
                       </div>
                     </ul>
-                   
                   </div>
                 </div>
               </div>
@@ -128,8 +124,6 @@
       </div>
     </form>
 
-
-
     <div class="containerLabelThread">
       <div class="containerLabel">
         <div
@@ -142,8 +136,6 @@
               {{ categories.label }}
             </div></a
           >
-         
-          
         </div>
       </div>
 
@@ -153,7 +145,6 @@
             <div class="cards">
               <div class="title-container">
                 <div class="title">
-                 
                   <p class="userId">{{ thread.email }}</p>
                   <p class="titre">{{ thread.titre }}</p>
                   <p class="titre">{{ thread.idthread }}</p>
@@ -168,24 +159,24 @@
                 Posté le {{ getFormatedDate(thread.datePost) }}
               </small>
 
-              <form @submit.prevent="t">
+              <form @submit.prevent="thread">
                 <div class="mt-3">
-                  <button 
-                   type="submit"
-                   class="btn btn-primary" 
-                   @click="likeDislikePost(thread.idthread)">
+                  <button
+                    type="submit"
+                    :class="
+                      thread.isLikedByConnectedUser
+                        ? 'btn btn-success'
+                        : 'btn btn-primary'
+                    "
+                    @click="likeDislikePost(thread.idthread)"
+                  >
                     <div class="containerCounter">
-                <i class="fas fa-thumbs-up" ></i>
-                <div
-                  class="counter"
-                  :key="countLike"
-                  v-for="countLike in countLike"
-                >
-                  <div class="likeDislike">
-                    {{ countLike }}
-                  </div>
-                </div>
-              </div>
+                      <i class="fas fa-thumbs-up"></i>
+
+                      <div class="likeDislike">
+                        {{ thread.nbLike }}
+                      </div>
+                    </div>
                   </button>
                   <button
                     type="submit"
@@ -203,8 +194,6 @@
                   >
                     <i class="fas fa-edit"></i> Modifier
                   </button>
-
-
 
                   <!-- Button trigger modal -->
                   <button
@@ -259,9 +248,6 @@
                         </div>
                       </div>
                     </div>
-
-                    
-                    
                   </div>
                 </div>
               </form>
@@ -277,7 +263,6 @@
 import { instance } from "../api";
 import moment from "moment";
 
-
 export default {
   name: "HelloWorld",
 
@@ -288,81 +273,55 @@ export default {
       threadPost: "",
       titre: "",
       user: localStorage.getItem("user"),
-      //email: localStorage.getItem("user"),
       userId: localStorage.getItem("userId"),
       imageUrl: "",
       image: null,
       selectedFile: null,
       file: "",
-      //idthread: this.$route.params.idthread,
-    
-      countLike: "",
       idthread: "",
     };
   },
 
-  created(idthread) {
+  created() {
     this.page = 1;
 
     const data = localStorage.getItem("authToken");
 
     if (data) {
       instance
-      .get("/threads/?page=1&size=5")
-      .then((reponse) => {
-        this.threads = reponse.data;
-        this.countLike = reponse.data[0].nbLike;
-        console.log(this.threads);
-      })
-      .catch((error) => {
-        console.log(error.response.status);
-      });
+        .get("/threads/?page=1&size=5")
+        .then((reponse) => {
+          this.threads = reponse.data;
 
-    document.addEventListener.call(window, "scroll", (event) => {
-      const scrollValue =
-        (window.innerHeight + window.scrollY) / document.body.offsetHeight;
+          console.log(this.threads);
+        })
+        .catch((error) => {
+          console.log(error.response.status);
+        });
 
-      if (scrollValue == 1) {
-        this.threads;
-        //this.page = this.page + 1;
-        ++this.page;
-        console.log(this.page);
+      document.addEventListener.call(window, "scroll", (event) => {
+        const scrollValue =
+          (window.innerHeight + window.scrollY) / document.body.offsetHeight;
 
-        instance
-          .get(`/threads/?page=${this.page}&size=5`)
-          .then((reponse) => {
+        if (scrollValue == 1) {
+          this.threads;
+          ++this.page;
+          console.log(this.page);
+
+          instance.get(`/threads/?page=${this.page}&size=5`).then((reponse) => {
             this.threads = this.threads.concat(reponse.data);
             console.log(this.threads);
-        });
-      }
-    });
+          });
+        }
+      });
 
-    instance
-      .get("/category")
-      //.get("/threads/category")
-      .then((reponse) => {
+      instance.get("/category").then((reponse) => {
         this.categories = reponse.data;
-    });
-
-
-
-    // instance
-    //   // .get(`/threads/countLike/${idthread}`)
-    //   .get(`/threads/countLike/${idthread}`)
-      
-    //   .then((reponse) => {
-    //     console.log(reponse);
-    //     this.countLike = reponse.data[0];
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-
+      });
     } else {
-      alert('Veuillez vous inscrire pour accèder à Groupomania');
+      alert("Veuillez vous inscrire pour accèder à Groupomania");
       this.$router.push("/signup");
     }
-    
   },
 
   methods: {
@@ -375,24 +334,25 @@ export default {
         })
         .catch((error) => {
           console.log(error);
-          console.log("FAILURE!!");
+          console.log("FAILURE findOne !!");
         });
     },
 
     likeDislikePost(idthread) {
       instance
-        .post(`/threads/${idthread}/like`,{
+        .post(`/threads/${idthread}/like`, {
           idUser: this.userId,
           idThread: `${idthread}`,
         })
         .then((response) => {
           console.log(response);
+          this.$router.go();
           console.log("like SUCCESSFULL home");
         })
         .catch((error) => {
           console.log(error);
           console.log("pas liké home");
-        })
+        });
     },
 
     deletePost(idthread) {
@@ -408,7 +368,6 @@ export default {
           console.log("FAILURE !!!");
         });
     },
-   
 
     onFilePicked(event) {
       this.image = this.$refs.meuh; //[0];
@@ -438,7 +397,6 @@ export default {
         formData.append("image", this.image.files[0]);
       }
 
-      
       formData.append("userId", this.userId);
       formData.append("email", this.user);
       formData.append("titre", this.titre);
@@ -475,8 +433,6 @@ export default {
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
-  
-
   },
 
   props: {
@@ -485,7 +441,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .header {
   background-color: #022c63;
@@ -493,9 +448,9 @@ export default {
   line-height: 70px;
 }
 
-
 .logo {
   color: whitesmoke;
+  text-decoration: none;
   text-transform: uppercase;
   font-weight: bold;
   letter-spacing: 1px;
@@ -512,7 +467,6 @@ export default {
 
 .menu a:hover {
   color: red;
-  border: solid 1px violet;
   border-radius: 3px;
   font-weight: bold;
 }
@@ -520,6 +474,7 @@ export default {
 .menu a {
   color: whitesmoke;
   margin-right: 20px;
+  cursor: pointer;
 }
 
 .hello {
@@ -591,7 +546,6 @@ export default {
 
 /* ----------------------------------- FIN MODAL ------------------------ */
 .cardThread {
-  
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
   padding: 5px;
   border-radius: 5px;
@@ -676,33 +630,32 @@ input.postThread {
 /*----------------------------------- RESPONSIVE -----------------------------------*/
 
 @media all and (max-width: 800px) {
+  .containerLabel {
+    display: none;
+  }
 
-.containerLabel {
-  display: none;
-}
+  .containerLabelThread {
+    display: inline;
+  }
 
-.containerLabelThread {
-  display: inline;
-}
+  .publication {
+    margin: 0px 20px 0px 20px;
+    width: auto;
+  }
 
-.publication{
-  margin: 0px 20px 0px 20px;
-  width: auto;
-}
+  .cards {
+    margin: 0;
+    margin-bottom: 10px;
+    width: auto;
+  }
 
-.cards {
-  margin: 0;
-  margin-bottom: 10px;
-  width: auto;
-}
+  .cardThread {
+    width: 90%;
+  }
 
-.cardThread {
-  width: 90%;
-}
-
-.categoryBurger {
-  visibility: visible;
-}
+  .categoryBurger {
+    visibility: visible;
+  }
 }
 
 /*-----------------------------------FIN RESPONSIVE -----------------------------------*/

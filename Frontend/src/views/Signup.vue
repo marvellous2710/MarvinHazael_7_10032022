@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="place">
     <h2>Créer un compte</h2>
     <hr />
 
@@ -84,4 +84,13 @@ export default {
     width: 50%;
     margin: auto;
 }
+
+
+.place{
+  background: #022c63;
+  padding: 30vh;
+  color: whitesmoke;
+}
+
+
 </style>

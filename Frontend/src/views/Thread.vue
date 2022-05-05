@@ -2,7 +2,7 @@
   <div class="oneThread">
     <header class="container-fluid header">
       <div class="container">
-        <a href="#home" class="logo">Groupomania</a>
+        <a href="/" class="logo">Groupomania</a>
         <nav class="menu">
           <a href="#category" class="categoryBurger"
             ><i class="fas fa-utensils"></i
@@ -33,17 +33,20 @@
 
         <form @submit.prevent="postComment">
           <div class="mt-3">
-            <button :class="[btnLiked]">
+            <button
+              type="submit"
+              :class="
+                thread.isLikedByConnectedUser
+                  ? 'btn btn-success'
+                  : 'btn btn-primary'
+              "
+              @click="likeDislikePost(thread.idthread)"
+            >
               <div class="containerCounter">
-                <i class="fas fa-thumbs-up" @click="likeDislikePost(thread.idthread)"></i>
-                <div
-                  class="counter"
-                  :key="countLike"
-                  v-for="countLike in countLike"
-                >
-                  <div class="likeDislike">
-                    {{ countLike }}
-                  </div>
+                <i class="fas fa-thumbs-up"></i>
+
+                <div class="likeDislike">
+                  {{ thread.nbLike }}
                 </div>
               </div>
             </button>
@@ -129,7 +132,7 @@
               <div class="title">
                 <p class="userId">{{ comment.email }}</p>
                 <p class="titre">{{ comment.titre }}</p>
-                <p class="titre">{{ comment.idthread }}</p>
+                <p class="titre">{{ comment.idComment }}</p>
               </div>
             </div>
 
@@ -141,12 +144,17 @@
               <div class="mt-3">
                 <button
                   type="submit"
-                  class="btn btn-primary"
+                  :class="
+                    comment.isLikedByConnectedUser
+                      ? 'btn btn-success'
+                      : 'btn btn-primary'
+                  "
                   @click="commentLike(comment.idComment)"
                 >
-                  <i class="fas fa-thumbs-up"></i> {{ currentValue }}
+                  <i class="fas fa-thumbs-up"></i>
+                  {{ comment.nbLikeComment }}
                 </button>
-              
+
                 <button
                   type="submit"
                   class="btn btn-primary"
@@ -237,12 +245,10 @@ export default {
       selectedFile: null,
       file: "",
       idThread: this.$route.params.idthread,
-      currentValue: 0,
 
+      idComment: "",
       comments: "",
       idComment: "",
-
-      btnLiked: "btn btn-primary",
     };
   },
 
@@ -273,24 +279,39 @@ export default {
           console.log("FAILURE!!");
         });
     },
-
-    likeDislikePost() {
+    likeDislikePost(idthread) {
       instance
-        .post(`/threads/${this.$route.params.idThread}/like`, {
+        .post(`/threads/${idthread}/like`, {
           idUser: this.userId,
-          idThread: this.idThread,
+          idThread: `${idthread}`,
         })
         .then((response) => {
           console.log(response);
-          //this.$router.go();
-          this.btnLiked = "btn btn-success";
-          console.log("like SUCCESS!!");
+          console.log("like SUCCESSFULL home");
         })
         .catch((error) => {
           console.log(error);
-          console.log("pas liké !!");
+          console.log("pas liké home");
         });
     },
+
+    // likeDislikePost() {
+    //   instance
+    //     .post(`/threads/${this.$route.params.idThread}/like`, {
+    //       idUser: this.userId,
+    //       idThread: this.idThread,
+    //     })
+    //     .then((response) => {
+    //       console.log(response);
+    //       //this.$router.go();
+
+    //       console.log("like SUCCESS!!");
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //       console.log("pas liké !!");
+    //     });
+    // },
     commentLike(idComment) {
       instance
         .post(`/threads/${idComment}/commentLike`, {
@@ -300,7 +321,7 @@ export default {
         .then((response) => {
           console.log(response);
           //this.$router.go();
-          // this.btnLiked = "btn btn-success";
+
           console.log("comment like SUCCESS!!");
         })
         .catch((error) => {
@@ -308,24 +329,6 @@ export default {
           console.log("comment pas liké !!");
         });
     },
-
-    // alreadyLiked() {
-    //   `/threads/${this.$route.params.idThread}/liked`,
-    //   {
-    //     idUser : this.userId,
-    //     idThread : this.idThread,
-    //   }
-    //   .then((response) => {
-    //     console.log(response);
-    //     //this.$router.go();
-    //     this.btnLiked = "btn-success";
-    //     console.log("already liked !!");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     console.log("t'es dans lerreur");
-    //   });
-    // },
 
     getFormatedDate(date) {
       return moment(String(date)).format("DD-MM-YYYY hh:mm");
@@ -369,29 +372,6 @@ export default {
       .catch((error) => {
         console.log(error);
       });
-
-    instance
-      .get(`/threads/countLike/${this.$route.params.idthread}`)
-      .then((reponse) => {
-        this.countLike = reponse.data[0];
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    // pour afficher que le like est bien liké par le user connecté
-    // instance
-    //   .get(`/threads/liked/${this.$route.params.idthread}`)
-    //   .then((response) => {
-    //     console.log(response);
-    //     //this.$router.go();
-    //     this.btnLiked = "btn-success";
-    //     console.log("already liked !!");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     console.log("t'es dans l'erreur");
-    //   });
   },
 };
 </script>
@@ -409,6 +389,7 @@ export default {
 
 .logo {
   color: whitesmoke;
+  text-decoration: none;
   text-transform: uppercase;
   font-weight: bold;
   letter-spacing: 1px;
@@ -425,7 +406,6 @@ export default {
 
 .menu a:hover {
   color: red;
-  border: solid 1px violet;
   border-radius: 3px;
   font-weight: bold;
 }
@@ -433,6 +413,7 @@ export default {
 .menu a {
   color: whitesmoke;
   margin-right: 20px;
+  cursor: pointer;
 }
 
 .hello {
@@ -561,7 +542,6 @@ export default {
   border-radius: 5px;
   width: 50%;
   margin: 10px auto;
-  
 }
 
 /*----------------------------------- RESPONSIVE -----------------------------------*/

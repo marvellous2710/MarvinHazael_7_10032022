@@ -1,5 +1,6 @@
 <template>
-  <div class="containerProfile">
+<div class="pageProfile">
+    <div class="containerProfile">
     <h2>Mon profile</h2>
     <hr />
     <div class="alert alert-success" v-if="isRight">Mot de passe modifié</div>
@@ -34,6 +35,8 @@
       </div>
     </form>
   </div>
+</div>
+
 </template>
 
 <script>
@@ -84,6 +87,13 @@ export default {
 </script>
 
 <style scoped>
+
+
+
+.pageProfile {
+  background: #022c63;
+}
+
 .form-control {
   width: 50%;
   margin: auto;

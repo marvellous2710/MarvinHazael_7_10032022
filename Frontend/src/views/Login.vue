@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="place">
     <h2>Connexion</h2>
     <hr />
 
@@ -60,3 +60,14 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+
+.place{
+  background: #022c63;
+  padding: 30vh;
+  color: whitesmoke;
+}
+
+</style>

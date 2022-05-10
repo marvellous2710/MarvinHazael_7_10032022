@@ -38,7 +38,7 @@ exports.login = (req, res, next) => {
             }
             if (bResult) {
                 const token = jwt.sign({
-                    email       : result[0].email,
+                    email  : result[0].email,
                     idUser : result[0].idUser,
                   },
                   "SECRETKEY",

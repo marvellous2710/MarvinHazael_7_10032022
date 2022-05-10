@@ -62,23 +62,30 @@ exports.likeDislike = (req, res, next) => {
   
 };
 
+
 exports.createThread = (req, res, next) => {
   const mysql = `INSERT INTO thread SET ?`;
 
+  
   //condition ternaire comme if else
   const thread = req.file
     ? {
-        userId : req.body.userId,
-        titre  : req.body.titre,      
-        content  : `${req.protocol}://${req.get("host")}/images/${
+        userId      : req.body.userId,
+        titre       : req.body.titre,     
+        idCategory  : req.body.idCategory,  
+        typeMessage : req.body.typeMessage,
+        content     : `${req.protocol}://${req.get("host")}/images/${
           req.file.filename
         }`,
       }
     : {
-        userId : req.body.userId,
-        titre  : req.body.titre,   
-        content : req.body.content 
+        userId      : req.body.userId,
+        titre       : req.body.titre,   
+        content     : req.body.content,
+        typeMessage : req.body.typeMessage,
+        idCategory  : req.body.idCategory 
       };
+
 
   db.query(mysql, thread, (err, result) => {
     if (err) {
@@ -113,7 +120,7 @@ exports.getAllThread = (req, res, next) => {
 
 
   const mysql = `
-    SELECT t.idthread, t.titre, t.datePost, t.content, t.idCategory, u.email,
+    SELECT t.idthread, t.titre, t.datePost, t.content, t.idCategory, u.email, t.typeMessage,
       SUM(CASE WHEN tl.idThread IS NOT NULL THEN 1 ELSE 0 END) nbLike,
       CASE WHEN utl.idUser IS NOT NULL THEN 1 ELSE 0 END isLikedByConnectedUser
     FROM thread t
@@ -124,7 +131,7 @@ exports.getAllThread = (req, res, next) => {
     LEFT JOIN likeDislike utl
       ON t.idthread = utl.idThread AND utl.idUser = ?
     
-    GROUP BY t.idthread, t.titre, t.datePost, t.idCategory, u.email, t.content, utl.idUser
+    GROUP BY t.idthread, t.titre, t.datePost, t.idCategory, u.email, t.content, utl.idUser, t.typeMessage
    
     ORDER BY t.idthread 
     DESC LIMIT ${size}
@@ -191,9 +198,9 @@ exports.getOneThread = (req, res, next) => {
 };
 
 
-exports.getCategory = (req, res, next) => {
+exports.getAllCategory = (req, res, next) => {
   const mysql = "SELECT * FROM categories";
-
+  
   db.query(mysql, (err, result) => {
     if (err) {
       return res.status(400).send({

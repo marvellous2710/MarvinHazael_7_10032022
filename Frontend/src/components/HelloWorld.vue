@@ -51,7 +51,7 @@
                   type="text"
                   class="postThread"
                   v-model="titre"
-                  placeholder="Publier ..."
+                  placeholder="Publier le titre ..."
                 />
 
                 <label for="file" class="btn btn-primary"
@@ -67,40 +67,50 @@
                     ref="meuh"
                     @change="onFilePicked"
                   />
-                  <div class="dropdown">
-                    <button
-                      class="btn btn-primary dropdown-toggle"
-                      type="button"
-                      id="dropdownMenuButton1"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      Catégories
-                    </button>
-                    <ul
-                      class="dropdown-menu"
-                      aria-labelledby="dropdownMenuButton1"
-                    >
-                      <div class="containerLabelModal">
-                        <div
-                          class="lapizzadelamamma"
-                          :key="categorie"
-                          v-for="categorie in categories"
-                        >
-                          <a class="dropdown-item" href="#scrollspyHeading5">{{
-                            categorie.label
-                          }}</a>
 
-                          <hr class="dropdown-divider" />
-                        </div>
-                      </div>
-                    </ul>
+                  <div class="containerTypeMess">
+                    <select
+                      class="selectTypeMess"
+                      @change="chooseTypeMess"
+                      v-model="typeMessage"
+                    >
+                      <option
+                        :value="tMess.idtypeMessage"
+                        v-for="(tMess, i) in typeMessage"
+                        :key="i"
+                      >
+                        {{ tMess.label }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="containerCategory">
+                    <select
+                      class="selectLabel"
+                      @change="chooseLabel"
+                      v-model="idCategory"
+                    >
+                      <option
+                        :value="category.idcategories"
+                        v-for="(category, i) in categories"
+                        :key="i"
+                      >
+                        {{ category.label }}
+                      </option>
+                    </select>
                   </div>
                 </div>
               </div>
 
               <div class="modal-body">
-                <img :src="imageUrl" height="150" />
+                <img :src="imageUrl" height="150" v-if="imageUrl" />
+                <input
+                  type="text"
+                  class="postThread"
+                  v-model="content"
+                  placeholder="Publier un commentaire ..."
+                  v-else
+                />
               </div>
               <div class="modal-footer">
                 <button
@@ -128,12 +138,12 @@
       <div class="containerLabel">
         <div
           class="lapizzadelamamma"
-          :key="categories"
-          v-for="categories in categories"
+          :key="category"
+          v-for="category in categories"
         >
           <a href="#"
             ><div class="label">
-              {{ categories.label }}
+              {{ category.label }}
             </div></a
           >
         </div>
@@ -148,10 +158,13 @@
                   <p class="userId">{{ thread.email }}</p>
                   <p class="titre">{{ thread.titre }}</p>
                   <p class="titre">{{ thread.idthread }}</p>
+                  <p class="titre" v-if="thread.typeMessage == 1">
+                    {{ thread.content }}
+                  </p>
                 </div>
               </div>
 
-              <div class="picture">
+              <div class="picture" v-if="thread.typeMessage == 2">
                 <img :src="thread.content" />
               </div>
 
@@ -189,7 +202,7 @@
                   <button
                     type="submit"
                     class="btn btn-primary"
-                    v-if="user == thread.email"
+                    v-if="user == thread.email || roleUser == 1"
                     @click="updatePost()"
                   >
                     <i class="fas fa-edit"></i> Modifier
@@ -201,7 +214,7 @@
                     class="btn btn-primary"
                     data-bs-toggle="modal"
                     data-bs-target="#enerveModal"
-                    v-if="user == thread.email"
+                    v-if="user == thread.email || roleUser == 1"
                   >
                     <i class="fas fa-trash-alt"></i> Supprimer
                   </button>
@@ -272,13 +285,18 @@ export default {
       threads: "",
       threadPost: "",
       titre: "",
+      content: "",
       user: localStorage.getItem("user"),
       userId: localStorage.getItem("userId"),
+      roleUser: localStorage.getItem("roleUser"),
       imageUrl: "",
       image: null,
       selectedFile: null,
       file: "",
       idthread: "",
+      idCategory: "",
+      
+      typeMessage: "",
     };
   },
 
@@ -318,6 +336,10 @@ export default {
       instance.get("/category").then((reponse) => {
         this.categories = reponse.data;
       });
+      instance.get("/category/typeMessage").then((reponse) => {
+        this.typeMessage = reponse.data;
+      });
+
     } else {
       alert("Veuillez vous inscrire pour accèder à Groupomania");
       this.$router.push("/signup");
@@ -325,6 +347,26 @@ export default {
   },
 
   methods: {
+    chooseLabel() {
+      const label = document.getElementsByClassName("selectLabel");
+
+      if (label.value == 0) {
+        console.log("nonon");
+      } else {
+        console.log("bravo label");
+      }
+    },
+
+    chooseTypeMess() {
+      const labelTypeMess = document.getElementsByClassName("selectTypeMess");
+
+      if (labelTypeMess.value == 0) {
+        console.log("nonon");
+      } else {
+        console.log("bravo type message ");
+      }
+    },
+
     findOne(idthread) {
       instance
         .get(`/threads/${idthread}`)
@@ -385,12 +427,6 @@ export default {
       console.log(this.image);
     },
 
-    disconnect() {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
-      this.$router.push("/login");
-    },
-
     postThread() {
       const formData = new FormData();
       if (this.image) {
@@ -400,6 +436,9 @@ export default {
       formData.append("userId", this.userId);
       formData.append("email", this.user);
       formData.append("titre", this.titre);
+      formData.append("content", this.content);
+      formData.append("typeMessage", this.typeMessage);
+      formData.append("idCategory", this.idCategory);
 
       instance
         .post("/threads/", formData, {
@@ -536,6 +575,12 @@ export default {
 
 .lapizzadelamamma a {
   text-decoration: none;
+}
+
+.selectLabel {
+  height: 40px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .sendImage {

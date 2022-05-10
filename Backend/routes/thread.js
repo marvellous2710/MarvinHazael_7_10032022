@@ -13,10 +13,10 @@ router.put("/:threadId", threadCtrl.modifyThread);
 router.delete("/:threadId", threadCtrl.deleteThread);
 
 //LIKE
-
 router.post("/:threadId/like", auth, threadCtrl.likeDislike);
 
-
+//CATEGORIES
+// router.get("/",auth, threadCtrl.getAllCategory);
 
 //COMMENT
 router.post("/comment/:threadId", auth, multer,threadCtrl.createComment);

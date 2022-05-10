@@ -37,7 +37,7 @@
               type="submit"
               :class="
                 thread.isLikedByConnectedUser
-                  ? 'btn btn-success'
+                   ? 'btn btn-success'
                   : 'btn btn-primary'
               "
               @click="likeDislikePost(thread.idthread)"
@@ -54,7 +54,8 @@
             <!-- Button trigger modal -->
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-primary" 
+              v-if="user == thread.email"
               data-bs-toggle="modal"
               data-bs-target="#modifyModal"
             >
@@ -154,15 +155,9 @@
                   <i class="fas fa-thumbs-up"></i>
                   {{ comment.nbLikeComment }}
                 </button>
+                
+               
 
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  v-if="user == thread.email"
-                  @click="updatePost()"
-                >
-                  <i class="fas fa-edit"></i> Modifier
-                </button>
 
                 <!-- Button trigger modal -->
                 <button
@@ -170,7 +165,7 @@
                   class="btn btn-primary"
                   data-bs-toggle="modal"
                   data-bs-target="#enerveModal"
-                  v-if="user == thread.email"
+                  v-if="user == comment.email"
                 >
                   <i class="fas fa-trash-alt"></i> Supprimer
                 </button>
@@ -224,6 +219,7 @@
         </div>
       </div>
     </div>
+  
   </div>
 </template>
 
@@ -245,7 +241,7 @@ export default {
       selectedFile: null,
       file: "",
       idThread: this.$route.params.idthread,
-
+      
       idComment: "",
       comments: "",
       idComment: "",
@@ -293,6 +289,11 @@ export default {
           console.log(error);
           console.log("pas liké home");
         });
+    },
+    disconnect() {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
+      this.$router.push("/login");
     },
 
     // likeDislikePost() {
@@ -377,6 +378,9 @@ export default {
 </script>
 
 <style scoped>
+
+
+
 .header {
   background-color: #022c63;
   height: 70px;

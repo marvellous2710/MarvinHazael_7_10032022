@@ -32,6 +32,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "thread" */ '../views/Thread.vue')
   },
   {
+    path: '/bycategory/:idCategory',
+    name: 'ByCategory',
+    component: () => import(/* webpackChunkName: "thread" */ '../views/ByCategory.vue')
+  },
+  {
     path: '/profile',
     name: 'Profile',
     component: () => import(/* webpackChunkName: "profile" */ '../views/Profile.vue')

@@ -5,24 +5,24 @@ const multer     = require('../middleware/multer-config');
 const threadCtrl = require('../controllers/thread');
 
 
-//THREAD
+//THREAD 
 router.post("/", auth, multer,threadCtrl.createThread);
 router.get("/", auth, threadCtrl.getAllThread);
 router.get("/:threadId", auth,  threadCtrl.getOneThread);
-router.put("/:threadId", threadCtrl.modifyThread);
+router.put("/:threadId",auth, multer, threadCtrl.modifyThread);
 router.delete("/:threadId", threadCtrl.deleteThread);
 
 //LIKE
 router.post("/:threadId/like", auth, threadCtrl.likeDislike);
 
 //CATEGORIES
-// router.get("/",auth, threadCtrl.getAllCategory);
+router.get("/:idCategory",auth, threadCtrl.getByCategory);
 
 //COMMENT
 router.post("/comment/:threadId", auth, multer,threadCtrl.createComment);
 router.get("/comments/:threadId", auth, multer,threadCtrl.getAllComment);
 router.post("/:threadId/commentLike", auth, threadCtrl.commentLike);
-
+router.delete("/:threadId/:commentId", threadCtrl.deleteComment);
 
 
 module.exports = router;

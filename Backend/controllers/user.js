@@ -3,16 +3,14 @@ const jwt     = require("jsonwebtoken");
 const db      = require("../lib/db");
 
 
-
 exports.login = (req, res, next) => {
     const user = ({ email: req.body.email});  
     const mysql = `SELECT * FROM users WHERE ?`;
-  
+
     db.query(
       mysql,user,
       (err, result) => {
         if (err) {
-          // throw err;
           return res.status(400).send({
             message: err,
           });
@@ -60,7 +58,6 @@ exports.login = (req, res, next) => {
       );
 };
 
-
 exports.signup = (req, res, next) => {
     const user = ({ email: req.body.email });
     const mysql = `SELECT idUser FROM users WHERE LOWER(email) = LOWER ?`;
@@ -104,16 +101,22 @@ exports.signup = (req, res, next) => {
   );
 }
 
+exports.deleteUser = (req, res, next) => {
+  // faire attention à ne pas supprimer totalement le user pour ne pas supprimer tous ses commentaires sur lesquelles des réactions ont été générées
+  //3 est l'id de disconnect
+  //faire en sorte qu'il ne puisse plus se logger mais que son compte existe toujours comme sur OC
+  const user = req.body.email;  
+  const mysql = `SELECT * FROM users WHERE email = ? `;
 
-exports.modifyUser = (req, res, next) => {
-    //si pas d'id ça marche quand meme sur postman mais pas dans mysql
-    const mysql = 'UPDATE users SET `name` = ?, `firstname` = ?,`profilepicture` = ?, `description`= ? WHERE user = ?';
-    const user = req.body; 
-    const data = [user.name, user.firstname, user.profilepicture, user.description, user.idtableUser];
-         
-    db.query(
-        mysql, data,
-      (err, result) => {
+
+  db.query(mysql, user, (err, result) => {
+   
+    if (result){
+    
+      const user = req.body.userId;
+      const sql = "UPDATE users SET email = 'userInconnu', roleUserID = 3  WHERE idUser = ? ";
+
+      db.query(sql, user, (err, result) => {
         if (err) {
           throw err;
           return res.status(400).send({
@@ -121,38 +124,13 @@ exports.modifyUser = (req, res, next) => {
           });
         }
         return res.status(201).send({
-          message: "Updated successfully !",
+          message: "user disconnect !",
         });
-      }
-    );
-}
-
-exports.deleteUser = (req, res, next) => {
-  // faire attention à ne pas supprimer totalement le user pour ne pas supprimer tous ses commentaires sur lesquelles des réactions ont été générées
-//supprimer que la photo par exemple
-//faire en sorte qu'il ne puisse plus se logger mais que son compte existe toujours comme sur OC
-}
-
-exports.allUser = (req, res, next) => {
-  const mysql = 'SELECT * FROM users ';
-
-  db.query(
-      mysql,
-    (err, result) => {
-      if (err) {
-        throw err;
-        return res.status(400).send({
-          message: err,
-        });
-      }  
-      return res.status(201).send(result)    
+      })
     }
-  );
-}
+  });
 
-exports.oneUser= (req, res, next) => {}
-
-
+};
 
 exports.modifyPassword = (req, res, next) => {
   const mysql      = "UPDATE users SET password = ? WHERE idUser = ?";

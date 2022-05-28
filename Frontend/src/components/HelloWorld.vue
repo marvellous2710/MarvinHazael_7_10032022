@@ -72,8 +72,8 @@
                     <select
                       class="selectTypeMess"
                       @change="chooseTypeMess"
-                      v-model="typeMessage"
-                    >
+                      v-model="typeMessage"                   
+                    > 
                       <option
                         :value="tMess.idtypeMessage"
                         v-for="(tMess, i) in typeMessage"
@@ -83,6 +83,8 @@
                       </option>
                     </select>
                   </div>
+
+              
 
                   <div class="containerCategory">
                     <select
@@ -134,6 +136,20 @@
       </div>
     </form>
 
+    <form @submit.prevent="categoryForm">
+      <div class="containerLabel">
+        <div class="newCat" :key="category" v-for="category in categories">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            @click="getCategory(category.idcategories)"
+          >
+            {{ category.label }}
+          </button>
+        </div>
+      </div>
+    </form>
+
     <div class="containerLabelThread">
       <div class="containerLabel">
         <div
@@ -157,7 +173,7 @@
                 <div class="title">
                   <p class="userId">{{ thread.email }}</p>
                   <p class="titre">{{ thread.titre }}</p>
-                  <p class="titre">{{ thread.idthread }}</p>
+
                   <p class="titre" v-if="thread.typeMessage == 1">
                     {{ thread.content }}
                   </p>
@@ -202,7 +218,7 @@
                   <button
                     type="submit"
                     class="btn btn-primary"
-                    v-if="user == thread.email || roleUser == 1"
+                    v-if="user == thread.email"
                     @click="updatePost()"
                   >
                     <i class="fas fa-edit"></i> Modifier
@@ -295,8 +311,8 @@ export default {
       file: "",
       idthread: "",
       idCategory: "",
-      
       typeMessage: "",
+      selectedtypeMessage: "",
     };
   },
 
@@ -304,6 +320,7 @@ export default {
     this.page = 1;
 
     const data = localStorage.getItem("authToken");
+    
 
     if (data) {
       instance
@@ -339,7 +356,6 @@ export default {
       instance.get("/category/typeMessage").then((reponse) => {
         this.typeMessage = reponse.data;
       });
-
     } else {
       alert("Veuillez vous inscrire pour accèder à Groupomania");
       this.$router.push("/signup");
@@ -351,9 +367,9 @@ export default {
       const label = document.getElementsByClassName("selectLabel");
 
       if (label.value == 0) {
-        console.log("nonon");
+        console.log("label not ok");
       } else {
-        console.log("bravo label");
+       console.log("label  ok");
       }
     },
 
@@ -361,9 +377,9 @@ export default {
       const labelTypeMess = document.getElementsByClassName("selectTypeMess");
 
       if (labelTypeMess.value == 0) {
-        console.log("nonon");
+        console.log("type message not ok");
       } else {
-        console.log("bravo type message ");
+        console.log("type message ok ");
       }
     },
 
@@ -377,6 +393,19 @@ export default {
         .catch((error) => {
           console.log(error);
           console.log("FAILURE findOne !!");
+        });
+    },
+    getCategory(idcategories) {
+      instance
+        .get(`/threads/${idcategories}`)
+        .then((reponse) => {
+          this.category = reponse.data;
+          //this.$router.push(`/thread/${idcategories}`);
+          this.$router.push(`/bycategory/${idcategories}`);
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("FAILURE category !!");
         });
     },
 
@@ -457,26 +486,18 @@ export default {
     getFormatedDate(date) {
       return moment(String(date)).format("DD-MM-YYYY hh:mm");
     },
-    onFileSelected(event) {
-      this.selectedFile = event.target.files[0];
-      const fileReader = new FileReader();
-      fileReader.addEventListener("load", () => {
-        this.imageUrl = fileReader.result;
-      });
-
-      console.log(this.selectedFile);
-    },
+   
 
     disconnect() {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
+
+
   },
 
-  props: {
-    msg: String,
-  },
+
 };
 </script>
 

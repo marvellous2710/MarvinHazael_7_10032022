@@ -4,8 +4,8 @@ const router     = require("./routes/user");
 const thread     = require("./routes/thread");
 const categories = require("./routes/category");
 const path       = require('path');
-const PORT = process.env.PORT || 4000;
-const app = express();
+const PORT       = process.env.PORT || 4000;
+const app        = express();
 
 
 //Security

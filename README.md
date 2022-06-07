@@ -3,7 +3,7 @@
 Cloner ce git : https://github.com/marvellous2710/P7new.git
 
 
-FRONTEND :
+## FRONTEND :
 
 1- Installer NodeJS, VueJS, Bootstrap, Moment
 
@@ -11,7 +11,7 @@ FRONTEND :
 
 
 
-BACKEND : 
+## BACKEND : 
 
 1- Installer dans le dossier backend les modules suivant : mySQL, express, jsonwebtoken, dotenv, cors, bcrypt, multer, nodemon
 

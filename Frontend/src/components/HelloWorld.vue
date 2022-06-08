@@ -4,9 +4,11 @@
       <div class="container">
         <a href="/" class="logo">Groupomania</a>
         <nav class="menu">
-          <a href="/"><i class="fas fa-globe"></i></a>
-          <a href="/profile"><i class="fas fa-user-alt"></i></a>
-          <a @click.prevent="disconnect"><i class="fas fa-sign-out-alt"></i></a>
+          <a href="/" title="Accueil"><i class="fas fa-globe"></i></a>
+          <a href="/profile" title="Profil"><i class="fas fa-user-alt"></i></a>
+          <a @click.prevent="disconnect" title="Se déconnecter"
+            ><i class="fas fa-sign-out-alt" style="color: white"></i
+          ></a>
         </nav>
       </div>
     </header>
@@ -54,11 +56,14 @@
                   placeholder="Publier le titre ..."
                 />
 
-                <label for="file" class="btn btn-primary"
+                <label
+                  for="file"
+                  class="btn btn-primary"
+                  v-if="typeMessageValue == 2"
                   ><i class="fas fa-image"></i
                 ></label>
 
-                <div class="btnPublication">
+                <div class="modal-title btnPublication">
                   <input
                     id="file"
                     type="file"
@@ -70,10 +75,11 @@
 
                   <div class="containerTypeMess">
                     <select
-                      class="selectTypeMess"
+                      class="form-select selectTypeMess"
                       @change="chooseTypeMess"
-                      v-model="typeMessage"                   
-                    > 
+                      v-model="typeMessageValue"
+                    >
+                      <option :value="null" disabled>Type message</option>
                       <option
                         :value="tMess.idtypeMessage"
                         v-for="(tMess, i) in typeMessage"
@@ -84,35 +90,26 @@
                     </select>
                   </div>
 
-              
-
-                  <div class="containerCategory">
-                    <select
-                      class="selectLabel"
-                      @change="chooseLabel"
-                      v-model="idCategory"
-                    >
-                      <option
-                        :value="category.idcategories"
-                        v-for="(category, i) in categories"
-                        :key="i"
-                      >
-                        {{ category.label }}
-                      </option>
-                    </select>
-                  </div>
+                
                 </div>
               </div>
-
+              <p class="error-message">
+                {{ errorMessage }}
+              </p>
               <div class="modal-body">
                 <img :src="imageUrl" height="150" v-if="imageUrl" />
-                <input
-                  type="text"
-                  class="postThread"
-                  v-model="content"
-                  placeholder="Publier un commentaire ..."
-                  v-else
-                />
+
+                <div class="form-group">
+                  <textarea
+                    class="form-control"
+                    id="textArea"
+                    rows="3"
+                    type="text"
+                    v-model="content"
+                    placeholder="Publier un commentaire ..."
+                    v-if="typeMessageValue == 1"
+                  ></textarea>
+                </div>
               </div>
               <div class="modal-footer">
                 <button
@@ -122,11 +119,7 @@
                 >
                   Annuler
                 </button>
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  :disabled="!titre.length"
-                >
+                <button type="submit" class="btn btn-primary">
                   <i class="fas fa-paper-plane"></i> Publier
                 </button>
               </div>
@@ -136,28 +129,10 @@
       </div>
     </form>
 
-    <form @submit.prevent="categoryForm">
-      <div class="containerLabel">
-        <div class="newCat" :key="category" v-for="category in categories">
-          <button
-            type="submit"
-            class="btn btn-primary"
-            @click="getCategory(category.idcategories)"
-          >
-            {{ category.label }}
-          </button>
-        </div>
-      </div>
-    </form>
-
     <div class="containerLabelThread">
       <div class="containerLabel">
-        <div
-          class="lapizzadelamamma"
-          :key="category"
-          v-for="category in categories"
-        >
-          <a href="#"
+        <div class="category" :key="category" v-for="category in categories">
+          <a @click="getCategory(category.idcategories)"
             ><div class="label">
               {{ category.label }}
             </div></a
@@ -291,6 +266,7 @@
 <script>
 import { instance } from "../api";
 import moment from "moment";
+import dayjs from "dayjs";
 
 export default {
   name: "HelloWorld",
@@ -310,9 +286,10 @@ export default {
       selectedFile: null,
       file: "",
       idthread: "",
-      idCategory: "",
+      idCategory: 1,
       typeMessage: "",
-      selectedtypeMessage: "",
+      typeMessageValue: null,
+      errorMessage: "",
     };
   },
 
@@ -320,11 +297,10 @@ export default {
     this.page = 1;
 
     const data = localStorage.getItem("authToken");
-    
 
     if (data) {
       instance
-        .get("/threads/?page=1&size=5")
+        .get(`/threads/${this.$route.params.categoryId}?page=1&size=5`)
         .then((reponse) => {
           this.threads = reponse.data;
 
@@ -343,16 +319,20 @@ export default {
           ++this.page;
           console.log(this.page);
 
-          instance.get(`/threads/?page=${this.page}&size=5`).then((reponse) => {
-            this.threads = this.threads.concat(reponse.data);
-            console.log(this.threads);
-          });
+          instance
+            .get(
+              `/threads/${this.$route.params.categoryId}?page=${this.page}&size=5`
+            )
+            .then((reponse) => {
+              this.threads = this.threads.concat(reponse.data);
+              console.log(this.threads);
+            });
         }
       });
 
-      instance.get("/category").then((reponse) => {
-        this.categories = reponse.data;
-      });
+      // instance.get("/category").then((reponse) => {
+      //   this.categories = reponse.data;
+      // });
       instance.get("/category/typeMessage").then((reponse) => {
         this.typeMessage = reponse.data;
       });
@@ -363,50 +343,26 @@ export default {
   },
 
   methods: {
-    chooseLabel() {
-      const label = document.getElementsByClassName("selectLabel");
-
-      if (label.value == 0) {
-        console.log("label not ok");
-      } else {
-       console.log("label  ok");
-      }
-    },
-
-    chooseTypeMess() {
-      const labelTypeMess = document.getElementsByClassName("selectTypeMess");
-
-      if (labelTypeMess.value == 0) {
-        console.log("type message not ok");
-      } else {
-        console.log("type message ok ");
-      }
-    },
-
     findOne(idthread) {
       instance
-        .get(`/threads/${idthread}`)
+        .get(`/threads/${idthread}`)     
         .then((reponse) => {
           this.thread = reponse.data;
           this.$router.push(`/thread/${idthread}`);
+          //this.$router.push({ name: "Thread", params: { threadId: idthread } });
+          
+         
         })
         .catch((error) => {
           console.log(error);
           console.log("FAILURE findOne !!");
         });
+
+       //this.$router.push({ name: "Thread", params: { threadId: idthread } });
+      
     },
     getCategory(idcategories) {
-      instance
-        .get(`/threads/${idcategories}`)
-        .then((reponse) => {
-          this.category = reponse.data;
-          //this.$router.push(`/thread/${idcategories}`);
-          this.$router.push(`/bycategory/${idcategories}`);
-        })
-        .catch((error) => {
-          console.log(error);
-          console.log("FAILURE category !!");
-        });
+      this.$router.push({ name: "Home", params: { categoryId: idcategories } });
     },
 
     likeDislikePost(idthread) {
@@ -457,47 +413,50 @@ export default {
     },
 
     postThread() {
-      const formData = new FormData();
-      if (this.image) {
-        formData.append("image", this.image.files[0]);
+      // if(this.titre == "" || this.content == "" || this.idCategory == null || this.typeMessage == null ){
+      if (this.titre == "" || this.content == "") {
+        //if(this.titre == ""){
+
+        this.errorMessage = "Veuillez remplir tous les champs";
+        return false;
+      } else {
+        const formData = new FormData();
+        if (this.image) {
+          formData.append("image", this.image.files[0]);
+        }
+
+        formData.append("userId", this.userId);
+        formData.append("email", this.user);
+        formData.append("titre", this.titre);
+        formData.append("content", this.content);
+        formData.append("typeMessage", this.typeMessageValue);
+        formData.append("idCategory", this.idCategory);
+
+        instance
+          .post("/threads/", formData, {
+            "Content-Type": "multipart/form-data",
+          })
+          .then((response) => {
+            console.log(response);
+            this.$router.go();
+            console.log("SUCCESS!!");
+          })
+          .catch((error) => {
+            console.log(error);
+            console.log("FAILURE!!");
+          });
       }
-
-      formData.append("userId", this.userId);
-      formData.append("email", this.user);
-      formData.append("titre", this.titre);
-      formData.append("content", this.content);
-      formData.append("typeMessage", this.typeMessage);
-      formData.append("idCategory", this.idCategory);
-
-      instance
-        .post("/threads/", formData, {
-          "Content-Type": "multipart/form-data",
-        })
-        .then((response) => {
-          console.log(response);
-          this.$router.go();
-          console.log("SUCCESS!!");
-        })
-        .catch((error) => {
-          console.log(error);
-          console.log("FAILURE!!");
-        });
     },
     getFormatedDate(date) {
-      return moment(String(date)).format("DD-MM-YYYY hh:mm");
+      return dayjs(String(date)).format("DD-MM-YYYY hh:mm");
     },
-   
 
     disconnect() {
       localStorage.removeItem("authToken");
       localStorage.removeItem("user"); //cela supprime un élément précis contrairement au CLEAR qui supprime tout le local alors qu'on pourrait avoir besoin d'autres éléments du local
       this.$router.push("/login");
     },
-
-
   },
-
-
 };
 </script>
 
@@ -555,6 +514,12 @@ export default {
   font-size: 2rem;
 }
 
+p.error-message {
+  color: red;
+  margin: 0;
+  padding: 0;
+}
+
 .publication {
   border: black solid 1px;
   border-radius: 10px;
@@ -578,6 +543,8 @@ export default {
   /* background-color: whitesmoke; */
   margin-right: 10px;
   color: whitesmoke;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .label:hover {

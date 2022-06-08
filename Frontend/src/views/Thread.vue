@@ -20,7 +20,7 @@
             <p class="userId">{{ thread.email }}</p>
             <p class="titre">{{ thread.titre }}</p>
 
-            <p class="titre" v-if="thread.typeMessage ==  1">
+            <p class="titre" v-if="thread.typeMessage == 1">
               {{ thread.content }}
             </p>
           </div>
@@ -28,8 +28,6 @@
         <div class="picture" v-if="thread.typeMessage == 2">
           <img :src="thread.content" />
         </div>
-
-       
 
         <small class="date">
           Posté le {{ getFormatedDate(thread.datePost) }}
@@ -94,6 +92,10 @@
                       ><i class="fas fa-image"></i
                     ></label>
 
+                     <div class="modal-body">
+                      <img :src="imageUrl" height="150"  />
+                    </div>
+
                     <input
                       id="file"
                       type="file"
@@ -118,14 +120,15 @@
                         </option>
                       </select>
                     </div>
-                  
-                    <input v-if="typeMessage == 1"
+
+                    <input
+                      v-if="typeMessage == 1"
                       type="text"
                       class="postThread"
                       v-model="content"
                       placeholder="Publier un commentaire ..."
                     />
-                    <div class="modal-body" v-if="typeMessage == 2">
+                    <div class="modal-body">
                       <img :src="imageUrl" height="150" v-if="imageUrl" />
                     </div>
                   </div>
@@ -150,11 +153,27 @@
               </div>
             </div>
 
-            <button class="btn btn-primary" v-if="user == thread.email || roleUser == 1">
+            <button
+              class="btn btn-primary"
+              v-if="user == thread.email || roleUser == 1"
+            >
               <i class="fas fa-trash-alt" @click="deletePost()"></i> Supprimer
             </button>
           </div>
           <div>
+            <div>
+              <label for="file" class="btn btn-primary"
+                  ><i class="fas fa-image"></i
+                ></label>
+                <input
+                    id="file"
+                    type="file"
+                    class="input-file"
+                    accept="image/*"
+                    ref="meuh"
+                    @change="onFilePicked"
+                    
+                  />
             <input
               type="text"
               class="postThread"
@@ -164,6 +183,10 @@
             <button class="btn btn-primary" :disabled="!titre.length">
               <i class="fas fa-paper-plane"></i> Envoyer
             </button>
+            </div>
+             
+
+            <img :src="imageUrl" height="300" v-if="imageUrl" />
           </div>
         </form>
       </div>
@@ -177,7 +200,12 @@
               <div class="title">
                 <p class="userId">{{ comment.email }}</p>
                 <p class="titre">{{ comment.titre }}</p>
-                <p class="titre">{{ comment.idComment }}</p>
+              
+               
+                <div class="picture">
+                <img :src="comment.content" />
+              </div>
+
               </div>
             </div>
 
@@ -265,7 +293,7 @@
 
 <script>
 import { instance } from "../api";
-import moment from "moment";
+import dayjs from "dayjs";
 
 export default {
   data() {
@@ -297,7 +325,7 @@ export default {
         .then((reponse) => {
           this.comment = reponse.data;
           this.$router.go();
-         
+
           console.log("comment supprimé !");
         })
         .catch((error) => {
@@ -386,7 +414,7 @@ export default {
         });
     },
 
-     chooseTypeMess() {
+    chooseTypeMess() {
       const labelTypeMess = document.getElementsByClassName("selectTypeMess");
 
       if (labelTypeMess.value == 0) {
@@ -397,32 +425,8 @@ export default {
     },
 
     getFormatedDate(date) {
-      return moment(String(date)).format("DD-MM-YYYY hh:mm");
+      return dayjs(String(date)).format("DD-MM-YYYY hh:mm");
     },
-
-
-
-    // ----------------CA MARCHE ----------------------------//
-    // updateThread() {
-    //   instance
-    //     .put(`/threads/${this.$route.params.idthread}`, {
-    //       titre: this.titre,
-    //       content: this.content,
-    //       typeMessage: this.typeMessage,
-    //     })
-    //     .then((reponse) => {
-    //       this.users = reponse.data;
-    //       this.$router.go();
-    //       console.log(reponse);
-    //       console.log("THREAD MODIFIE");
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //       console.log("thread pas modifié");
-    //     });
-        
-    // },
-    // ----------------CA MARCHE  FIN pour changer le titre et le text----------------------------//
 
     updateThread() {
       const formData = new FormData();
@@ -438,7 +442,7 @@ export default {
         .put(`/threads/${this.$route.params.idthread}`, formData, {
           "Content-Type": "multipart/form-data",
         })
-       
+
         .then((reponse) => {
           //this.users = reponse.data;
           this.$router.go();
@@ -453,31 +457,37 @@ export default {
   },
 
   created() {
-    instance
-      .get(`/threads/${this.$route.params.idthread}`)
-      .then((reponse) => {
-        this.thread = reponse.data;
-        console.log("thread ok !");
-      })
-      .catch((error) => {
-        console.log(error);
-        console.log("le thread s'affiche pas");
+    const data = localStorage.getItem("authToken");
+
+    if (data) {
+      instance
+        .get(`/threads/${this.$route.params.idthread}`)
+        .then((reponse) => {
+          this.thread = reponse.data;
+          console.log("thread ok !");
+        })
+        .catch((error) => {
+          console.log(error);
+          console.log("le thread s'affiche pas");
+        });
+
+      instance
+        .get(`/threads/comments/${this.$route.params.idthread}`)
+        .then((reponse) => {
+          this.comments = reponse.data;
+          console.log(this.comments);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      instance.get("/category/typeMessage").then((reponse) => {
+        this.typeMessage = reponse.data;
       });
-
-    instance
-      .get(`/threads/comments/${this.$route.params.idthread}`)
-      .then((reponse) => {
-        this.comments = reponse.data;
-
-        console.log(this.comments);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    instance.get("/category/typeMessage").then((reponse) => {
-      this.typeMessage = reponse.data;
-    });
+    } else {
+      alert("Veuillez vous inscrire pour accèder à Groupomania");
+      this.$router.push("/signup");
+    }
   },
 };
 </script>

@@ -1,7 +1,6 @@
 const db = require("../lib/db");
 const fs = require("fs");
 
-
 exports.createThread = (req, res, next) => {
   const mysql = `INSERT INTO thread SET ?`;
 
@@ -41,6 +40,13 @@ exports.getAllThread = (req, res, next) => {
   const size = req.query.size;
   const pageNumber = req.query.page;
   const offset = (pageNumber - 1) * size;
+  let data = [req.auth.userId];
+  
+
+  if (req.params.idCategory) {
+    data.push(req.params.idCategory);
+  }
+ 
 
   const mysql = `
     SELECT t.idthread, t.titre, t.datePost, t.content, t.idCategory, u.email, t.typeMessage,
@@ -53,14 +59,14 @@ exports.getAllThread = (req, res, next) => {
       ON t.userId = u.idUser
     LEFT JOIN likeDislike utl
       ON t.idthread = utl.idThread AND utl.idUser = ?
-    
+    ${req.params.idCategory ? 'WHERE t.idCategory = ?' : ''}
     GROUP BY t.idthread, t.titre, t.datePost, t.idCategory, u.email, t.content, utl.idUser, t.typeMessage
-   
+  
     ORDER BY t.idthread 
     DESC LIMIT ${size}
     OFFSET ${offset}`;
 
-  db.query(mysql, [req.auth.userId], (err, result) => {
+  db.query(mysql, data, (err, result) => {
     if (err) {
       return res.status(400).send({
         message: err.message,
@@ -70,6 +76,7 @@ exports.getAllThread = (req, res, next) => {
   });
   return res.status(201);
 };
+
 
 exports.getOneThread = (req, res, next) => {
   const mysql = `
@@ -86,7 +93,7 @@ exports.getOneThread = (req, res, next) => {
     WHERE t.idthread = ? 
     GROUP BY t.idthread, t.titre, t.datePost,  u.email, t.content, utl.idUser,t.typeMessage   
     `;
-
+console.log(mysql);
   const threadId = req.params.threadId;
 
   db.query(mysql, [req.auth.userId, threadId], (err, result) => {
@@ -118,7 +125,7 @@ exports.getAllCategory = (req, res, next) => {
     return res.status(201).send(result);
   });
   return res.status(201);
-};
+}; 
 
 exports.deleteThread = (req, res, next) => {
   const threadId = req.params.threadId;
@@ -175,7 +182,7 @@ exports.modifyThread = (req, res, next) => {
   db.query(mysql, [threadId], (err, result) => {
     if (result[0]) {
       console.log(result[0]);
-      
+          
       const sql = "UPDATE thread SET ? WHERE idthread = ?";
       // const newThread = { 
       //   titre : req.body.titre , 
@@ -476,37 +483,4 @@ exports.deleteComment = (req, res, next) => {
   });
 };
 
-exports.getByCategory = (req, res, next) => {
-  const mysql = `
-  SELECT  t.idthread, t.titre, t.datePost, t.content, u.email,
-    SUM(CASE WHEN tl.idThread IS NOT NULL THEN 1 ELSE 0 END) nbLike,
-    CASE WHEN utl.idUser IS NOT NULL THEN 1 ELSE 0 END isLikedByConnectedUser
-  FROM thread t
-  LEFT JOIN likeDislike tl
-    ON t.idthread = tl.idThread
-  JOIN users u
-    ON t.userId = u.idUser
-  LEFT JOIN likeDislike utl
-    ON t.idthread = utl.idThread AND utl.idUser = ${req.auth.userId}
-  WHERE t.idCategory = ? 
-  GROUP BY t.idthread, t.titre, t.datePost,  u.email, t.content, utl.idUser   
-  `;
 
-  const idCategory = req.params.idCategory;
-
-  db.query(mysql, [idCategory], (err, result) => {
-    if (err) {
-      throw err;
-      return res.status(500).send({
-        message: err,
-      });
-    }
-    console.log(result);
-    if (result.length === 0) {
-      return res.status(404).send({
-        message: `Thread not found `,
-      });
-    }
-    return res.status(201).send(result[0]);
-  });
-};

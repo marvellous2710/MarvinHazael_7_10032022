@@ -1,9 +1,8 @@
 <template>
   <div id="nav">
-    <router-link to="/login">Se connecter</router-link> |
-    <router-link to="/signup">S'inscrire</router-link>
-
-    <router-view />
+    
+ 
+    <router-view :key="$route.fullPath" />
   </div>
 </template>
 

@@ -1,5 +1,7 @@
 <template>
   <div class="place">
+    <router-link to="/login">Se connecter</router-link>
+   
     <h2>Créer un compte</h2>
     <hr />
 
@@ -12,25 +14,25 @@
           type="text"
           class="form-control"
           v-model="name"
-          placeholder="name"
+          placeholder="Nom"
         />
         <input
           type="text"
           class="form-control"
           v-model="firstname"
-          placeholder="firstname"
+          placeholder="Prénom"
         />
         <input
           type="text"
           class="form-control"
           v-model="email"
-          placeholder="email"
+          placeholder="Email"
         />
         <input
           type="password"
           class="form-control"
           v-model="password"
-          placeholder="password"
+          placeholder="Mot de passe"
         />
       </div>
 
@@ -90,6 +92,18 @@ export default {
   background: #022c63;
   padding: 30vh;
   color: whitesmoke;
+}
+
+.place a {
+  color: 	#DC143C;
+  text-decoration: none;
+}
+
+@media all and (max-width: 800px) {
+
+.place {
+  padding: 0;
+}
 }
 
 

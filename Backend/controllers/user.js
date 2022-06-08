@@ -3,6 +3,7 @@ const jwt     = require("jsonwebtoken");
 const db      = require("../lib/db");
 
 
+
 exports.login = (req, res, next) => {
     const user = ({ email: req.body.email});  
     const mysql = `SELECT * FROM users WHERE ?`;
@@ -114,7 +115,7 @@ exports.deleteUser = (req, res, next) => {
     if (result){
     
       const user = req.body.userId;
-      const sql = "UPDATE users SET email = 'userInconnu', roleUserID = 3  WHERE idUser = ? ";
+      const sql = "UPDATE users SET roleUserID = 3  WHERE idUser = ? ";
 
       db.query(sql, user, (err, result) => {
         if (err) {

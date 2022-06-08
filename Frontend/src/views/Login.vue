@@ -1,5 +1,7 @@
 <template>
   <div class="place">
+  
+    <router-link to="/signup">S'inscrire</router-link>
     <h2>Connexion</h2>
     <hr />
 
@@ -10,11 +12,11 @@
     <form @submit.prevent="onLogin">
       <div class="form-group">
         <label>Email</label>
-        <input type="text" class="form-control" v-model="email" />
+        <input type="text" class="form-control" v-model="email" placeholder="email"/>
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" class="form-control" v-model="password" />
+        <input type="password" class="form-control" v-model="password" placeholder="mot de passe"/>
       </div>
 
       <div class="mt-3">
@@ -68,6 +70,18 @@ export default {
   background: #022c63;
   padding: 30vh;
   color: whitesmoke;
+}
+
+.place a {
+  color: 	#DC143C;
+  text-decoration: none;
+}
+
+@media all and (max-width: 800px) {
+
+.place {
+  padding: 0;
+}
 }
 
 </style>

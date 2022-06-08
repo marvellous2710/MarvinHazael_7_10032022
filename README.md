@@ -6,7 +6,7 @@ Cloner ce git : https://github.com/marvellous2710/P7new.git
 
 ## FRONTEND :
 
-- Installer NodeJS, VueJS, Bootstrap, Moment
+- Installer NodeJS, VueJS, Bootstrap, dayjs
 
 - Pour lancer le Frontend : installer "yarn" puis " yarn serve " dans la console depuis le dossier Frontend
 

@@ -4,7 +4,7 @@ const auth       = require('../middleware/auth');
 const multer     = require('../middleware/multer-config');
 const threadCtrl = require('../controllers/thread');
  
-//THREAD 
+//THREAD  
 router.post("/", auth, multer,threadCtrl.createThread);
 //router.get("/:idCategory?", auth, threadCtrl.getAllThread); //le ? rend optionnel idcategory
 router.get("/:threadId", auth,  threadCtrl.getOneThread);

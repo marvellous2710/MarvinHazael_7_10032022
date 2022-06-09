@@ -92,9 +92,7 @@
                       ><i class="fas fa-image"></i
                     ></label>
 
-                     <div class="modal-body">
-                      <img :src="imageUrl" height="150"  />
-                    </div>
+                    
 
                     <input
                       id="file"
@@ -153,12 +151,7 @@
               </div>
             </div>
 
-            <button
-              class="btn btn-primary"
-              v-if="user == thread.email || roleUser == 1"
-            >
-              <i class="fas fa-trash-alt" @click="deletePost()"></i> Supprimer
-            </button>
+            
           </div>
           <div>
             <div>
@@ -183,16 +176,9 @@
             <button class="btn btn-primary" :disabled="!titre.length">
               <i class="fas fa-paper-plane"></i> Envoyer
             </button>
+              <hr />
             </div>
-             
-
-            <img :src="imageUrl" height="300" v-if="imageUrl" />
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div class="containerCom">
+               <div class="containerCom">
       <div :key="comment" v-for="comment in comments">
         <div class="containerComments">
           <div class="cardsComments">
@@ -288,6 +274,16 @@
         </div>
       </div>
     </div>
+
+            <img :src="imageUrl" height="300" v-if="imageUrl" />
+          </div>
+        </form>
+      </div>
+    </div>
+
+   
+
+   
   </div>
 </template>
 
@@ -652,12 +648,14 @@ export default {
 /*----------------------------------- COMMENTS -----------------------------------*/
 
 .cardsComments {
+  border: solid 2px #022c63;
   background-color: whitesmoke;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.171);
   padding: 10px;
   border-radius: 5px;
-  width: 50%;
+  width: 100%;
   margin: 10px auto;
+  
 }
 
 /*----------------------------------- RESPONSIVE -----------------------------------*/

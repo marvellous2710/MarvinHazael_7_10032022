@@ -77,7 +77,7 @@ exports.signup = (req, res, next) => {
               message: err,
             });
           } else {    
-            const user = ({ email: req.body.email, password: hash });
+            const user = ({ email: req.body.email, password: hash , name: req.body.name, firstname: req.body.firstname });
             const mysql = `INSERT INTO users SET ?`;
       
             db.query(
@@ -103,9 +103,7 @@ exports.signup = (req, res, next) => {
 }
 
 exports.deleteUser = (req, res, next) => {
-  // faire attention à ne pas supprimer totalement le user pour ne pas supprimer tous ses commentaires sur lesquelles des réactions ont été générées
-  //3 est l'id de disconnect
-  //faire en sorte qu'il ne puisse plus se logger mais que son compte existe toujours comme sur OC
+
   const user = req.body.email;  
   const mysql = `SELECT * FROM users WHERE email = ? `;
 
@@ -115,7 +113,8 @@ exports.deleteUser = (req, res, next) => {
     if (result){
     
       const user = req.body.userId;
-      const sql = "UPDATE users SET roleUserID = 3  WHERE idUser = ? ";
+      //const sql = "UPDATE users SET roleUserID = 3  WHERE idUser = ? ";
+      const sql = "DELETE FROM users WHERE idUser = ? ";
 
       db.query(sql, user, (err, result) => {
         if (err) {

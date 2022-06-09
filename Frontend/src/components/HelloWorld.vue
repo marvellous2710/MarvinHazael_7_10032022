@@ -119,7 +119,7 @@
                 >
                   Annuler
                 </button>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" :disabled="!this.titre">
                   <i class="fas fa-paper-plane"></i> Publier
                 </button>
               </div>
@@ -190,14 +190,7 @@
                     <i class="fas fa-comment-alt"></i> Répondre
                   </button>
 
-                  <button
-                    type="submit"
-                    class="btn btn-primary"
-                    v-if="user == thread.email"
-                    @click="updatePost()"
-                  >
-                    <i class="fas fa-edit"></i> Modifier
-                  </button>
+                  
 
                   <!-- Button trigger modal -->
                   <button
@@ -413,9 +406,9 @@ export default {
     },
 
     postThread() {
-      // if(this.titre == "" || this.content == "" || this.idCategory == null || this.typeMessage == null ){
-      if (this.titre == "" || this.content == "") {
-        //if(this.titre == ""){
+     
+      if (this.titre == "" ) {
+      
 
         this.errorMessage = "Veuillez remplir tous les champs";
         return false;
